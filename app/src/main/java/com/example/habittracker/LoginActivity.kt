@@ -34,7 +34,7 @@ class LoginActivity : AppCompatActivity() {
         val username = binding.userNameLoginEditText.text.toString()
         val password = binding.passwordLoginEditText.text.toString()
 
-        Log.i("LoginActivity", "Attempting login: $username $password")
+        Log.i("LoginActivity", "Attempting login for user: $username")
 
         val user = repo.getUserByUsername(username)
         if (user == null) {
