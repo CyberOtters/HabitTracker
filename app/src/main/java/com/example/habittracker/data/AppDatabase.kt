@@ -21,7 +21,7 @@ abstract class AppDatabase : RoomDatabase() {
 
     companion object {
         const val DATABASE_NAME = "HabitTracker.db"
-        const val USER_TABLE_NAME = "Users"
+        const val USER_TABLE_NAME = "User"
 
         // For Singleton instantiation
         @Volatile
