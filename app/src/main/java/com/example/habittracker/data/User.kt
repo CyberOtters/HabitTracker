@@ -1,5 +1,6 @@
 package com.example.habittracker.data
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
@@ -16,11 +17,16 @@ data class User(
 
     val username: String,
 
+    @ColumnInfo(defaultValue = "0" )
+    val isAdmin: Boolean,
+
     val passwordHash: String,
 
     val passwordSalt: String,
 
-    val createdAt: Long = System.currentTimeMillis(),
+    @ColumnInfo(defaultValue = "CURRENT_TIMESTAMP" )
+    val createdAt: Long,
 
-    val updatedAt: Long = System.currentTimeMillis()
+    @ColumnInfo(defaultValue = "CURRENT_TIMESTAMP" )
+    val updatedAt: Long
 )
