@@ -9,10 +9,10 @@ import androidx.room.Query
 @Dao
 interface UserDao {
 
-    @Query("SELECT * FROM users WHERE username = :username LIMIT 1")
+    @Query("SELECT * FROM ${AppDatabase.USER_TABLE_NAME} WHERE username = :username LIMIT 1")
     suspend fun getByUsername(username: String): User?
 
-    @Query("SELECT * FROM users WHERE id = :id LIMIT 1")
+    @Query("SELECT * FROM ${AppDatabase.USER_TABLE_NAME} WHERE id = :id LIMIT 1")
     suspend fun getById(id: Int): User?
 
     @Insert
@@ -21,6 +21,6 @@ interface UserDao {
     @Delete
     suspend fun delete(user: User)
 
-    @Query("SELECT * FROM users")
+    @Query("SELECT * FROM ${AppDatabase.USER_TABLE_NAME}")
     suspend fun getAll(): List<User>
 }
