@@ -67,6 +67,10 @@ class MainActivity : ComponentActivity() {
         repo = AppRepository.getInstance(this)
         sharedPrefs = getSharedPreferences("HabitTrackerPrefs", MODE_PRIVATE)
 
+        launchApp()
+    }
+
+    fun launchApp(){
         if (intent.hasExtra(USER_ID)) {
             loggedInUserId = intent.getIntExtra(USER_ID, -1)
             // save to shared preferences
@@ -178,12 +182,3 @@ fun LogoutButton(handleLogout: () -> Unit) {
         Text("Logout")
     }
 }
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    HabitTrackerTheme {
-        Greeting("Android")
-    }
-}
-
