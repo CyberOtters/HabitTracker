@@ -22,6 +22,8 @@ abstract class AppDatabase : RoomDatabase() {
     companion object {
         const val DATABASE_NAME = "HabitTracker.db"
         const val USER_TABLE_NAME = "User"
+        const val HABIT_TABLE_NAME = "Habit"
+        const val HABIT_LOG_TABLE_NAME = "HabitLog"
 
         // For Singleton instantiation
         @Volatile
@@ -49,7 +51,7 @@ abstract class AppDatabase : RoomDatabase() {
 
                             for ((username, password) in users) {
                                 val (salt, hash) = hashPassword(password)
-                                db.execSQL("INSERT INTO ${USER_TABLE_NAME} (username, passwordSalt, passwordHash) VALUES ('${username}', '${salt}', '${hash}')")
+                                db.execSQL("INSERT INTO ${USER_TABLE_NAME} (username, passwordSalt, passwordHash, isAdmin) VALUES ('${username}', '${salt}', '${hash}', ${username == "admin"})")
                             }
                         }
                     }
