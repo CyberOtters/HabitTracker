@@ -30,7 +30,7 @@ import androidx.room.PrimaryKey
     ]
 )
 data class HabitLog(
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
 
     val habitId: Int,
@@ -43,9 +43,9 @@ data class HabitLog(
 
     val completed: Boolean? = null,
 
-    @ColumnInfo(defaultValue = "CURRENT_TIMESTAMP" )
+    @ColumnInfo(defaultValue = "CURRENT_TIMESTAMP")
     val createdAt: Long,
 
-    @ColumnInfo(defaultValue = "CURRENT_TIMESTAMP" )
+    @ColumnInfo(defaultValue = "CURRENT_TIMESTAMP")
     val updatedAt: Long
 )
