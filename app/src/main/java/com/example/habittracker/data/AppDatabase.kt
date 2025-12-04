@@ -10,7 +10,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.habittracker.utils.hashPassword
 
 @Database(
-    entities = [User::class],
+    entities = [User::class, Habit::class, HabitLog::class],
     version = 1,
     exportSchema = false
 )
