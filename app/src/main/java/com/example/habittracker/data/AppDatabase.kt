@@ -49,7 +49,7 @@ abstract class AppDatabase : RoomDatabase() {
 
                             for ((username, password) in users) {
                                 val (salt, hash) = hashPassword(password)
-                                db.execSQL("INSERT INTO users (username, passwordSalt, passwordHash) VALUES ('${username}', '${salt}', '${hash}')")
+                                db.execSQL("INSERT INTO ${USER_TABLE_NAME} (username, passwordSalt, passwordHash) VALUES ('${username}', '${salt}', '${hash}')")
                             }
                         }
                     }
