@@ -11,7 +11,6 @@ import com.example.habittracker.data.AppRepository
 import com.example.habittracker.databinding.ActivityLoginBinding
 import com.example.habittracker.utils.verifyPassword
 import kotlinx.coroutines.launch
-import com.example.habittracker.ui.theme.HabitTrackerTheme
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
