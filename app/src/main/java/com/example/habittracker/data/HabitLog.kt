@@ -5,6 +5,8 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.example.habittracker.utils.NormalizedDate
+import java.util.Date
 
 @Entity(
     tableName = AppDatabase.HABIT_LOG_TABLE_NAME,
@@ -37,15 +39,15 @@ data class HabitLog(
 
     val userId: Int,
 
-    val date: Long,
+    val date: NormalizedDate,
 
     val note: String? = null,
 
     val completed: Boolean? = null,
 
-    @ColumnInfo(defaultValue = "CURRENT_TIMESTAMP")
-    val createdAt: Long,
+    @ColumnInfo(defaultValue = "(strftime('%s','now') * 1000)")
+    val createdAt: Date,
 
-    @ColumnInfo(defaultValue = "CURRENT_TIMESTAMP")
-    val updatedAt: Long
+    @ColumnInfo(defaultValue = "(strftime('%s','now') * 1000)")
+    val updatedAt: Date
 )

@@ -6,14 +6,19 @@ import android.util.Log
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.example.habittracker.utils.NormalizedDate
 import com.example.habittracker.utils.hashPassword
+import java.util.Calendar
+import java.util.Date
 
 @Database(
     entities = [User::class, Habit::class, HabitLog::class],
     version = 1,
     exportSchema = false
 )
+@TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun userDao(): UserDao
@@ -52,6 +57,22 @@ abstract class AppDatabase : RoomDatabase() {
                             for ((username, password) in users) {
                                 val (salt, hash) = hashPassword(password)
                                 db.execSQL("INSERT INTO ${USER_TABLE_NAME} (username, passwordSalt, passwordHash, isAdmin) VALUES ('${username}', '${salt}', '${hash}', ${username == "admin"})")
+                            }
+
+                            // seed Habits
+                            db.execSQL("INSERT INTO ${HABIT_TABLE_NAME} (name, description, points, userId) VALUES ('Drink Water', 'Drink 8 glasses of water', 4, 1)")
+                            db.execSQL("INSERT INTO ${HABIT_TABLE_NAME} (name, description, points, userId) VALUES ('Exercise', '30 minutes of exercise', 5, 1)")
+                            db.execSQL("INSERT INTO ${HABIT_TABLE_NAME} (name, description, points, userId) VALUES ('Read Book', 'Read for 20 minutes', 5, 1)")
+
+                            // seed HabitLogs
+                            for (i in 1..5) {
+                                val date = Date().apply {
+                                    val cal = Calendar.getInstance()
+                                    cal.time = this
+                                    cal.add(java.util.Calendar.DAY_OF_YEAR, -i)
+                                    this.time = cal.timeInMillis
+                                }
+                                db.execSQL("INSERT INTO ${HABIT_LOG_TABLE_NAME} (habitId, userId, date, note, completed) VALUES (1, 1, ${NormalizedDate.from(date).utcMidnightMillis}, 'Felt good', 1)")
                             }
                         }
                     }

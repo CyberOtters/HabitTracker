@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import java.util.Date
 
 @Entity(
     tableName = AppDatabase.HABIT_TABLE_NAME,
@@ -33,11 +34,11 @@ data class Habit(
 
     val points : Int = 0,
 
-    @ColumnInfo(defaultValue = "CURRENT_TIMESTAMP" )
-    val createdAt: Long,
+    @ColumnInfo(defaultValue = "(strftime('%s','now') * 1000)" )
+    val createdAt: Date,
 
-    @ColumnInfo(defaultValue = "CURRENT_TIMESTAMP" )
-    val updatedAt: Long
+    @ColumnInfo(defaultValue = "(strftime('%s','now') * 1000)" )
+    val updatedAt: Date
 ){
     init {
         require(points in -5..5) { "points must be between -5 and 5" }

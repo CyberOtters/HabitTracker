@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import java.util.Date
 
 @Entity(
     tableName = AppDatabase.USER_TABLE_NAME,
@@ -24,9 +25,9 @@ data class User(
 
     val passwordSalt: String,
 
-    @ColumnInfo(defaultValue = "CURRENT_TIMESTAMP" )
-    val createdAt: Long,
+    @ColumnInfo(defaultValue = "(strftime('%s','now') * 1000)" )
+    val createdAt: Date,
 
-    @ColumnInfo(defaultValue = "CURRENT_TIMESTAMP" )
-    val updatedAt: Long
+    @ColumnInfo(defaultValue = "(strftime('%s','now') * 1000)" )
+    val updatedAt: Date
 )
