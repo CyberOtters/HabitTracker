@@ -1,9 +1,10 @@
 package com.example.habittracker
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -13,6 +14,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.Button
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -24,22 +26,99 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import com.example.habittracker.ui.theme.HabitTrackerTheme
+import android.content.SharedPreferences
+import android.widget.Button
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.unit.dp
+import com.example.habittracker.data.AppRepository
+import com.example.habittracker.data.User
+import com.example.habittracker.databinding.ActivityMainBinding
+import androidx.core.content.edit
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
+
 
 class MainActivity : ComponentActivity() {
+    companion object {
+        const val USER_ID = "com.example.habittracker.USER_ID"
+        fun createIntent(context: Context, userId: Int): Intent {
+            val intent = Intent(context, MainActivity::class.java)
+            intent.putExtra(USER_ID, userId)
+            return intent
+        }
+    }
+
+    private lateinit var binding: ActivityMainBinding
+
+    private lateinit var repo: AppRepository
+
+    private lateinit var sharedPrefs: SharedPreferences
+
+    private var loggedInUserId = -1
+
+    private var loggedInUser: User? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            HabitTrackerTheme {
-                HabitTrackerApp()
+
+        repo = AppRepository.getInstance(this)
+        sharedPrefs = getSharedPreferences("HabitTrackerPrefs", MODE_PRIVATE)
+
+        launchApp()
+    }
+
+    fun launchApp(){
+        if (intent.hasExtra(USER_ID)) {
+            loggedInUserId = intent.getIntExtra(USER_ID, -1)
+            // save to shared preferences
+            sharedPrefs.edit {
+                putInt(USER_ID, loggedInUserId)
+            }
+        } else if (sharedPrefs.contains(USER_ID)) {
+            loggedInUserId = sharedPrefs.getInt(USER_ID, -1)
+        }
+
+        if (loggedInUserId == -1) {
+            val intent = LoginActivity.createIntent(this)
+            startActivity(intent)
+            finish()
+        } else {
+            lifecycleScope.launch {
+                val user = repo.getUserById(loggedInUserId)
+                if (user == null) {
+                    // user not found, redirect to login
+                    val intent = LoginActivity.createIntent(this@MainActivity)
+                    startActivity(intent)
+                    finish()
+                } else {
+                    loggedInUser = user
+                    setContent {
+                        HabitTrackerTheme {
+                            HabitTrackerApp(loggedInUser as User, handleLogout = { logoutUser() })
+                        }
+                    }
+                }
             }
         }
     }
+
+    fun logoutUser() {
+        loggedInUserId = -1
+        sharedPrefs.edit {
+            remove(USER_ID)
+        }
+        val intent = LoginActivity.createIntent(this)
+        startActivity(intent)
+        finish()
+    }
 }
 
-@PreviewScreenSizes
+
 @Composable
-fun HabitTrackerApp() {
+fun HabitTrackerApp(user: User, handleLogout: () -> Unit) {
     var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.HOME) }
 
     NavigationSuiteScaffold(
@@ -60,10 +139,20 @@ fun HabitTrackerApp() {
         }
     ) {
         Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            Greeting(
-                name = "Android",
-                modifier = Modifier.padding(innerPadding)
-            )
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ){
+                Greeting(
+                    name = user.username,
+                    modifier = Modifier.padding(innerPadding)
+                )
+                Spacer(modifier = Modifier.padding(16.dp))
+                LogoutButton(handleLogout = handleLogout)
+            }
         }
     }
 }
@@ -85,10 +174,11 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
     )
 }
 
-@Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
-    HabitTrackerTheme {
-        Greeting("Android")
+fun LogoutButton(handleLogout: () -> Unit) {
+    Button(
+        onClick = handleLogout
+    ) {
+        Text("Logout")
     }
 }
