@@ -41,6 +41,9 @@ abstract class AppDatabase : RoomDatabase() {
         }
 
         private fun buildDatabase(context: Context): AppDatabase {
+            // uncomment this line to delete the database file
+            // context.deleteDatabase(DATABASE_NAME)
+
             return Room.databaseBuilder(context, AppDatabase::class.java, DATABASE_NAME)
                 .addCallback(
                     object : Callback() {
