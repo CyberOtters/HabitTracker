@@ -30,7 +30,11 @@ import android.content.SharedPreferences
 import android.widget.Button
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Card
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
 import com.example.habittracker.data.AppRepository
@@ -38,6 +42,7 @@ import com.example.habittracker.data.User
 import com.example.habittracker.databinding.ActivityMainBinding
 import androidx.core.content.edit
 import androidx.lifecycle.lifecycleScope
+import com.example.habittracker.data.Habit
 import kotlinx.coroutines.launch
 
 
@@ -95,9 +100,12 @@ class MainActivity : ComponentActivity() {
                     finish()
                 } else {
                     loggedInUser = user
+                    val habits = repo.getHabitByUserId(loggedInUserId)
                     setContent {
                         HabitTrackerTheme {
-                            HabitTrackerApp(loggedInUser as User, handleLogout = { logoutUser() })
+                            HabitTrackerApp(loggedInUser as User,
+                                            habits = habits,
+                                            handleLogout = { logoutUser() })
                         }
                     }
                 }
@@ -118,7 +126,7 @@ class MainActivity : ComponentActivity() {
 
 
 @Composable
-fun HabitTrackerApp(user: User, handleLogout: () -> Unit) {
+fun HabitTrackerApp(user: User, habits: List<Habit>, handleLogout: () -> Unit) {
     var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.HOME) }
 
     NavigationSuiteScaffold(
@@ -151,6 +159,9 @@ fun HabitTrackerApp(user: User, handleLogout: () -> Unit) {
                     modifier = Modifier.padding(innerPadding)
                 )
                 Spacer(modifier = Modifier.padding(16.dp))
+                if (currentDestination == AppDestinations.HOME) {
+                    HabitsList(habits = habits)
+                }
                 LogoutButton(handleLogout = handleLogout)
             }
         }
@@ -180,5 +191,36 @@ fun LogoutButton(handleLogout: () -> Unit) {
         onClick = handleLogout
     ) {
         Text("Logout")
+    }
+}
+
+@Composable
+fun HabitsList(habits: List<Habit>, modifier: Modifier = Modifier) {
+    if (habits.isEmpty()) {
+        Text(text = "No habits recorded yet.")
+    } else {
+        LazyColumn(modifier = modifier) {
+            items(habits) { habit ->
+                HabitItem(habit = habit)
+                Spacer(modifier = Modifier.padding(4.dp))
+            }
+        }
+    }
+}
+
+@Composable
+fun HabitItem(habit: Habit) {
+    Card(modifier = Modifier.fillMaxSize()) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(text = "Habit: ${habit.name}")
+                Text(text = "Description: ${habit.description}")
+                Text(text = "Points: ${habit.points}")
+                Text(text = "Date: ${habit.createdAt}")
+            }
+        }
     }
 }
