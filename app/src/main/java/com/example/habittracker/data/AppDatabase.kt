@@ -22,6 +22,7 @@ import java.util.Date
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun userDao(): UserDao
+    abstract fun habitDao(): HabitDAO
 
 
     companion object {
