@@ -46,7 +46,7 @@ abstract class AppDatabase : RoomDatabase() {
         }
 
         private fun buildDatabase(context: Context): AppDatabase {
-            // remove this line to persist databased between app restarts
+            // remove this line to persist database between app restarts
              context.deleteDatabase(DATABASE_NAME)
 
             return Room.databaseBuilder(context, AppDatabase::class.java, DATABASE_NAME)
