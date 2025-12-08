@@ -1,5 +1,9 @@
 package com.example.habittracker.utils
 
+import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneOffset
+import java.time.ZonedDateTime
 import java.util.Calendar
 import java.util.Date
 import java.util.TimeZone
@@ -24,6 +28,13 @@ value class NormalizedDate(val utcMidnightMillis: Long) {
         }
 
         fun now(): NormalizedDate = from(Date())
+
+        fun of(year: Int, month: Int, dayOfMonth: Int): NormalizedDate {
+            val localDate = LocalDate.of(year, month, dayOfMonth)
+            val zonedDateTime = ZonedDateTime.of(localDate, LocalTime.MIDNIGHT, ZoneOffset.UTC)
+            val millis = zonedDateTime.toInstant().toEpochMilli()
+            return NormalizedDate(millis)
+        }
     }
 
     fun toDate(): Date = Date(utcMidnightMillis)
