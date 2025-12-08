@@ -1,10 +1,13 @@
 package com.example.habittracker.data
 
 import androidx.room.ColumnInfo
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
+import androidx.room.Junction
 import androidx.room.PrimaryKey
+import androidx.room.Relation
 import java.util.Date
 
 @Entity(
@@ -55,3 +58,12 @@ data class HabitCategoryCrossRef(
     val categoryId: Int
 )
 
+data class HabitCategoryWithHabits(
+    @Embedded val category: HabitCategory,
+    @Relation(
+        parentColumn = "categoryId",
+        entityColumn = "habitId",
+        associateBy = Junction(HabitCategoryCrossRef::class)
+    )
+    val songs: List<Habit>
+)
