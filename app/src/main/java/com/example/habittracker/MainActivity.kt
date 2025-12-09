@@ -43,6 +43,7 @@ import com.example.habittracker.databinding.ActivityMainBinding
 import androidx.core.content.edit
 import androidx.lifecycle.lifecycleScope
 import com.example.habittracker.data.Habit
+import com.example.habittracker.data.HabitLog
 import kotlinx.coroutines.launch
 
 
@@ -75,7 +76,7 @@ class MainActivity : ComponentActivity() {
         launchApp()
     }
 
-    fun launchApp(){
+    fun launchApp() {
         if (intent.hasExtra(USER_ID)) {
             loggedInUserId = intent.getIntExtra(USER_ID, -1)
             // save to shared preferences
@@ -101,17 +102,23 @@ class MainActivity : ComponentActivity() {
                 } else {
                     loggedInUser = user
                     val habits = repo.getHabitByUserId(loggedInUserId)
+                    val habitLogs = repo.getHabitLogsForUser(loggedInUserId)
+
                     setContent {
                         HabitTrackerTheme {
-                            HabitTrackerApp(loggedInUser as User,
-                                            habits = habits,
-                                            handleLogout = { logoutUser() })
+                            HabitTrackerApp(
+                                user = loggedInUser as User,
+                                habits = habits,
+                                habitLogs = habitLogs,
+                                handleLogout = { logoutUser() }
+                            )
                         }
                     }
                 }
             }
         }
     }
+
 
     fun logoutUser() {
         loggedInUserId = -1
@@ -126,7 +133,12 @@ class MainActivity : ComponentActivity() {
 
 
 @Composable
-fun HabitTrackerApp(user: User, habits: List<Habit>, handleLogout: () -> Unit) {
+fun HabitTrackerApp(
+    user: User,
+    habits: List<Habit>,
+    habitLogs: List<HabitLog>,
+    handleLogout: () -> Unit
+) {
     var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.HOME) }
 
     NavigationSuiteScaffold(
@@ -153,7 +165,7 @@ fun HabitTrackerApp(user: User, habits: List<Habit>, handleLogout: () -> Unit) {
                     .padding(innerPadding),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
-            ){
+            ) {
                 Greeting(
                     name = user.username,
                     modifier = Modifier.padding(innerPadding)
@@ -161,12 +173,15 @@ fun HabitTrackerApp(user: User, habits: List<Habit>, handleLogout: () -> Unit) {
                 Spacer(modifier = Modifier.padding(16.dp))
                 if (currentDestination == AppDestinations.HOME) {
                     HabitsList(habits = habits)
+                    Spacer(modifier = Modifier.padding(16.dp))
+                    Text(text = "Habit logs count: ${habitLogs.size}")
                 }
                 LogoutButton(handleLogout = handleLogout)
             }
         }
     }
 }
+
 
 enum class AppDestinations(
     val label: String,

@@ -21,6 +21,8 @@ class AppRepository @Inject constructor(
 
     suspend fun getHabitByUserId(userId: Int) = db.habitDao().getHabitByUserId(userId)
 
+    suspend fun getHabitLogsForUser(userId: Int) =
+        db.habitLogDao().getHabitLogsForUser(userId)
     companion object {
 
         // For Singleton instantiation
