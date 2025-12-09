@@ -14,7 +14,7 @@ import java.util.Calendar
 import java.util.Date
 
 @Database(
-    entities = [User::class, Habit::class, HabitLog::class],
+    entities = [User::class, Habit::class, HabitLog::class, HabitCategory::class, HabitCategoryCrossRef::class],
     version = 1,
     exportSchema = false
 )
@@ -22,6 +22,8 @@ import java.util.Date
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun userDao(): UserDao
+
+    abstract fun habitCategoryDao(): HabitCategoryDao
     abstract fun habitDao(): HabitDAO
 
     abstract fun habitLogDao(): HabitLogDao
@@ -34,6 +36,10 @@ abstract class AppDatabase : RoomDatabase() {
         const val HABIT_TABLE_NAME = "Habit"
         const val HABIT_LOG_TABLE_NAME = "HabitLog"
 
+        const val HABIT_CATEGORY_TABLE_NAME = "HabitCategory"
+
+        const val HABIT_CATEGORY_CROSS_REF_TABLE_NAME = "HabitCategoryCrossRef"
+
         // For Singleton instantiation
         @Volatile
         private var instance: AppDatabase? = null
@@ -45,8 +51,8 @@ abstract class AppDatabase : RoomDatabase() {
         }
 
         private fun buildDatabase(context: Context): AppDatabase {
-            // uncomment this line to delete the database file
-            // context.deleteDatabase(DATABASE_NAME)
+            // remove this line to persist database between app restarts
+             context.deleteDatabase(DATABASE_NAME)
 
             return Room.databaseBuilder(context, AppDatabase::class.java, DATABASE_NAME)
                 .addCallback(
@@ -81,6 +87,14 @@ abstract class AppDatabase : RoomDatabase() {
                                 }
                                 db.execSQL("INSERT INTO ${HABIT_LOG_TABLE_NAME} (habitId, userId, date, note, completed) VALUES (1, 1, ${NormalizedDate.from(date).utcMidnightMillis}, 'Felt good', 1)")
                             }
+                            // seed HabitCategories
+                            db.execSQL("INSERT INTO ${HABIT_CATEGORY_TABLE_NAME} (userId, name, description) VALUES (1, 'Health', 'Habits related to health and wellness')")
+                            db.execSQL("INSERT INTO ${HABIT_CATEGORY_TABLE_NAME} (userId, name, description) VALUES (1, 'Productivity', 'Habits to boost productivity')")
+
+                            // seed HabitCategoryCrossRefs
+                            db.execSQL("INSERT INTO ${HABIT_CATEGORY_CROSS_REF_TABLE_NAME} (habitId, habitCategoryId) VALUES (1, 1)") // Drink Water -> Health
+                            db.execSQL("INSERT INTO ${HABIT_CATEGORY_CROSS_REF_TABLE_NAME} (habitId, habitCategoryId) VALUES (2, 1)") // Exercise -> Health
+                            db.execSQL("INSERT INTO ${HABIT_CATEGORY_CROSS_REF_TABLE_NAME} (habitId, habitCategoryId) VALUES (3, 2)") // Read Book -> Productivity
                         }
                     }
                 )

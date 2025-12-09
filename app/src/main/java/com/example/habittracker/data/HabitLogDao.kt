@@ -21,7 +21,7 @@ interface HabitLogDao {
     suspend fun deleteHabitLog(habitLog: HabitLog)
     //Removes a log entry
 
-    @Query("SELECT * FROM HabitLog WHERE id = :id")
+    @Query("SELECT * FROM HabitLog WHERE habitLogId = :id")
     suspend fun getHabitLogById(id: Int): HabitLog?
 
     @Query("SELECT * FROM HabitLog WHERE userId = :userId AND habitId = :habitId AND date = :date")

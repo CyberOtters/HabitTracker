@@ -5,6 +5,9 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import androidx.room.Embedded
+import androidx.room.Relation
+import androidx.room.Junction
 import java.util.Date
 
 @Entity(
@@ -12,7 +15,7 @@ import java.util.Date
     foreignKeys = [
         ForeignKey(
             entity = User::class,
-            parentColumns = ["id"],
+            parentColumns = ["userId"],
             childColumns = ["userId"],
             onDelete = ForeignKey.CASCADE
         )
@@ -24,7 +27,7 @@ import java.util.Date
 
 data class Habit(
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    val habitId: Int = 0,
 
     val userId: Int,
 
@@ -44,3 +47,13 @@ data class Habit(
         require(points in -5..5) { "points must be between -5 and 5" }
     }
 }
+
+data class HabitWithHabitCategories(
+    @Embedded val habit: Habit,
+    @Relation(
+        parentColumn = "habitId",
+        entityColumn = "categoryId",
+        associateBy = Junction(HabitCategoryCrossRef::class)
+    )
+    val songs: List<HabitCategory>
+)
