@@ -21,13 +21,17 @@ interface HabitLogDao {
     suspend fun deleteHabitLog(habitLog: HabitLog)
     //Removes a log entry
 
-    @Query("SELECT * FROM habit_logs WHERE id = :id")
+    @Query("SELECT * FROM HabitLog WHERE id = :id")
     suspend fun getHabitLogById(id: Int): HabitLog?
 
-    @Query("SELECT * FROM habit_logs WHERE userId = :userId AND habitId = :habitId AND date = :date")
-    suspend fun getHabitLogForDate(userId: Int, habitId: Int, date: NormalizedDate): HabitLog?
+    @Query("SELECT * FROM HabitLog WHERE userId = :userId AND habitId = :habitId AND date = :date")
+    suspend fun getHabitLogForDate(
+        userId: Int,
+        habitId: Int,
+        date: NormalizedDate
+    ): HabitLog?
 
-    @Query("SELECT * FROM habit_logs WHERE userId = :userId ORDER BY date DESC")
+    @Query("SELECT * FROM HabitLog WHERE userId = :userId ORDER BY date DESC")
     suspend fun getHabitLogsForUser(userId: Int): List<HabitLog>
     //Gets all the logs for a user starting with the newest date
 }
