@@ -22,6 +22,8 @@ import java.util.Date
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun userDao(): UserDao
+
+    abstract fun habitCategoryDao(): HabitCategoryDao
     abstract fun habitDao(): HabitDAO
 
     abstract fun habitLogDao(): HabitLogDao
@@ -86,13 +88,13 @@ abstract class AppDatabase : RoomDatabase() {
                                 db.execSQL("INSERT INTO ${HABIT_LOG_TABLE_NAME} (habitId, userId, date, note, completed) VALUES (1, 1, ${NormalizedDate.from(date).utcMidnightMillis}, 'Felt good', 1)")
                             }
                             // seed HabitCategories
-                            db.execSQL("INSERT INTO ${HABIT_CATEGORY_TABLE_NAME} (name, description) VALUES ('Health', 'Habits related to health and wellness')")
-                            db.execSQL("INSERT INTO ${HABIT_CATEGORY_TABLE_NAME} (name, description) VALUES ('Productivity', 'Habits to boost productivity')")
+                            db.execSQL("INSERT INTO ${HABIT_CATEGORY_TABLE_NAME} (userId, name, description) VALUES (1, 'Health', 'Habits related to health and wellness')")
+                            db.execSQL("INSERT INTO ${HABIT_CATEGORY_TABLE_NAME} (userId, name, description) VALUES (1, 'Productivity', 'Habits to boost productivity')")
 
                             // seed HabitCategoryCrossRefs
-                            db.execSQL("INSERT INTO ${HABIT_CATEGORY_CROSS_REF_TABLE_NAME} (habitId, categoryId) VALUES (1, 1)") // Drink Water -> Health
-                            db.execSQL("INSERT INTO ${HABIT_CATEGORY_CROSS_REF_TABLE_NAME} (habitId, categoryId) VALUES (2, 1)") // Exercise -> Health
-                            db.execSQL("INSERT INTO ${HABIT_CATEGORY_CROSS_REF_TABLE_NAME} (habitId, categoryId) VALUES (3, 2)") // Read Book -> Productivity
+                            db.execSQL("INSERT INTO ${HABIT_CATEGORY_CROSS_REF_TABLE_NAME} (habitId, habitCategoryId) VALUES (1, 1)") // Drink Water -> Health
+                            db.execSQL("INSERT INTO ${HABIT_CATEGORY_CROSS_REF_TABLE_NAME} (habitId, habitCategoryId) VALUES (2, 1)") // Exercise -> Health
+                            db.execSQL("INSERT INTO ${HABIT_CATEGORY_CROSS_REF_TABLE_NAME} (habitId, habitCategoryId) VALUES (3, 2)") // Read Book -> Productivity
                         }
                     }
                 )

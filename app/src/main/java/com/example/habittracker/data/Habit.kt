@@ -15,7 +15,7 @@ import java.util.Date
     foreignKeys = [
         ForeignKey(
             entity = User::class,
-            parentColumns = ["id"],
+            parentColumns = ["userId"],
             childColumns = ["userId"],
             onDelete = ForeignKey.CASCADE
         )
@@ -27,7 +27,7 @@ import java.util.Date
 
 data class Habit(
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    val habitId: Int = 0,
 
     val userId: Int,
 

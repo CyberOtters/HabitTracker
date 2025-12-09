@@ -13,13 +13,13 @@ import java.util.Date
     foreignKeys = [
         ForeignKey(
             entity = User::class,
-            parentColumns = ["id"],
+            parentColumns = ["userId"],
             childColumns = ["userId"],
             onDelete = ForeignKey.CASCADE
         ),
         ForeignKey(
             entity = Habit::class,
-            parentColumns = ["id"],
+            parentColumns = ["habitId"],
             childColumns = ["habitId"],
             onDelete = ForeignKey.CASCADE
         )
@@ -33,7 +33,7 @@ import java.util.Date
 )
 data class HabitLog(
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    val habitLogId: Int = 0,
 
     val habitId: Int,
 

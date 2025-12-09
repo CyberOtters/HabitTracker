@@ -12,10 +12,23 @@ import java.util.Date
 
 @Entity(
     tableName = AppDatabase.HABIT_CATEGORY_TABLE_NAME,
+    foreignKeys = [
+        ForeignKey(
+            entity = User::class,
+            parentColumns = ["userId"],
+            childColumns = ["userId"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ],
+    indices = [
+        Index(value = ["userId"])
+    ]
 )
 data class HabitCategory(
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    val habitCategoryId: Int = 0,
+
+    val userId: Int,
 
     val name: String,
 
@@ -33,37 +46,37 @@ data class HabitCategory(
 
 @Entity(
     tableName = AppDatabase.HABIT_CATEGORY_CROSS_REF_TABLE_NAME,
-    primaryKeys = ["habitId", "categoryId"],
+    primaryKeys = ["habitId", "habitCategoryId"],
     foreignKeys = [
         ForeignKey(
             entity = Habit::class,
-            parentColumns = ["id"],
+            parentColumns = ["habitId"],
             childColumns = ["habitId"],
             onDelete = ForeignKey.CASCADE
         ),
         ForeignKey(
             entity = HabitCategory::class,
-            parentColumns = ["id"],
-            childColumns = ["categoryId"],
+            parentColumns = ["habitCategoryId"],
+            childColumns = ["habitCategoryId"],
             onDelete = ForeignKey.CASCADE
         )
     ],
     indices = [
         Index(value = ["habitId"]),
-        Index(value = ["categoryId"]),
+        Index(value = ["habitCategoryId"]),
     ]
 )
 data class HabitCategoryCrossRef(
     val habitId: Int,
-    val categoryId: Int
+    val habitCategoryId: Int
 )
 
 data class HabitCategoryWithHabits(
-    @Embedded val category: HabitCategory,
+    @Embedded val habitCategory: HabitCategory,
     @Relation(
-        parentColumn = "categoryId",
+        parentColumn = "habitCategoryId",
         entityColumn = "habitId",
         associateBy = Junction(HabitCategoryCrossRef::class)
     )
-    val songs: List<Habit>
+    val habits: List<Habit>
 )

@@ -39,7 +39,7 @@ class LoginActivity : AppCompatActivity() {
         if (user == null) {
             Toast.makeText(this, "User not found", Toast.LENGTH_LONG).show()
         } else if (verifyPassword(password, user.passwordSalt, user.passwordHash)) {
-            val intent = MainActivity.createIntent(this, user.id)
+            val intent = MainActivity.createIntent(this, user.userId)
             startActivity(intent)
         } else {
             Toast.makeText(this, "Invalid password", Toast.LENGTH_LONG).show()
