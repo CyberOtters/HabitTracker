@@ -24,6 +24,9 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun userDao(): UserDao
     abstract fun habitDao(): HabitDAO
 
+    abstract fun habitLogDao(): HabitLogDao
+
+
 
     companion object {
         const val DATABASE_NAME = "HabitTracker.db"
