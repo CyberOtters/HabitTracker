@@ -43,6 +43,7 @@ import com.example.habittracker.databinding.ActivityMainBinding
 import androidx.core.content.edit
 import androidx.lifecycle.lifecycleScope
 import com.example.habittracker.data.Habit
+import com.example.habittracker.data.HabitLog
 import kotlinx.coroutines.launch
 
 
