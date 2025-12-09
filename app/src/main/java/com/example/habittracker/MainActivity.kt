@@ -75,7 +75,7 @@ class MainActivity : ComponentActivity() {
         launchApp()
     }
 
-    fun launchApp(){
+    fun launchApp() {
         if (intent.hasExtra(USER_ID)) {
             loggedInUserId = intent.getIntExtra(USER_ID, -1)
             // save to shared preferences
@@ -101,17 +101,23 @@ class MainActivity : ComponentActivity() {
                 } else {
                     loggedInUser = user
                     val habits = repo.getHabitByUserId(loggedInUserId)
+                    val habitLogs = repo.getHabitLogsForUser(loggedInUserId)
+
                     setContent {
                         HabitTrackerTheme {
-                            HabitTrackerApp(loggedInUser as User,
-                                            habits = habits,
-                                            handleLogout = { logoutUser() })
+                            HabitTrackerApp(
+                                user = loggedInUser as User,
+                                habits = habits,
+                                habitLogs = habitLogs,
+                                handleLogout = { logoutUser() }
+                            )
                         }
                     }
                 }
             }
         }
     }
+
 
     fun logoutUser() {
         loggedInUserId = -1
