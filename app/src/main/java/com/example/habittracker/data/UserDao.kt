@@ -12,6 +12,9 @@ interface UserDao {
     @Query("SELECT * FROM ${AppDatabase.USER_TABLE_NAME} WHERE username = :username LIMIT 1")
     suspend fun getByUsername(username: String): User?
 
+    @Query("SELECT * FROM ${AppDatabase.USER_TABLE_NAME}")
+    suspend fun getAllUsers(): List<User>
+
     @Query("SELECT * FROM ${AppDatabase.USER_TABLE_NAME} WHERE userId = :id LIMIT 1")
     suspend fun getById(id: Int): User?
 

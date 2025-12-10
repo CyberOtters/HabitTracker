@@ -16,7 +16,8 @@ class AppRepository @Inject constructor(
 
     suspend fun getUserByUsername(username: String) = db.userDao().getByUsername(username)
 
-    // TODO: Delete if not necessary
+    suspend fun getAllUsers() = db.userDao().getAllUsers()
+
     suspend fun getAllHabit() = db.habitDao().getAllHabit()
 
     suspend fun getHabitByUserId(userId: Int) = db.habitDao().getHabitByUserId(userId)
