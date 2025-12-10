@@ -7,6 +7,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.example.habittracker.utils.NormalizedDate
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface HabitLogDao {
@@ -32,6 +33,6 @@ interface HabitLogDao {
     ): HabitLog?
 
     @Query("SELECT * FROM HabitLog WHERE userId = :userId ORDER BY date DESC")
-    suspend fun getHabitLogsForUser(userId: Int): List<HabitLog>
+    fun getHabitLogsForUser(userId: Int): Flow<List<HabitLog>>
     //Gets all the logs for a user starting with the newest date
 }

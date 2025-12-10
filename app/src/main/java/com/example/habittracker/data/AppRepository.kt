@@ -55,8 +55,16 @@ class AppRepository @Inject constructor(
     /***********************
      * HabitLog Operations *
      ***********************/
-    suspend fun getHabitLogsForUser(userId: Int) =
+    fun getHabitLogsForUser(userId: Int) =
         db.habitLogDao().getHabitLogsForUser(userId)
+
+    fun getHabitLogsForLoggedInUser(): Flow<List<HabitLog>> {
+        val loggedInUserId = sharedPrefs.getInt(USER_ID, -1)
+        if (loggedInUserId == -1) {
+            throw IllegalArgumentException("No user is currently logged in.")
+        }
+        return db.habitLogDao().getHabitLogsForUser(loggedInUserId)
+    }
 
     companion object {
 
