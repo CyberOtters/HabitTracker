@@ -1,5 +1,6 @@
 package com.example.habittracker.ui.components
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -14,18 +15,23 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.asLiveData
 import com.example.habittracker.data.AppRepository
-import com.example.habittracker.data.User
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
 @Composable
-fun AdminDashboard(repo: AppRepository, users: List<User>) {
+fun AdminDashboard(repo: AppRepository) {
     val coroutineScope = CoroutineScope(Dispatchers.Main)
+    val context = LocalContext.current
+    val users = repo.getAllUsers().asLiveData().observeAsState(initial = emptyList()).value
+
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -51,7 +57,13 @@ fun AdminDashboard(repo: AppRepository, users: List<User>) {
                         Column() {
                             Button(onClick = {
                                 coroutineScope.launch {
-                                    repo.deleteUser(user)
+                                    try {
+                                        repo.deleteUser(user)
+                                    } catch (e: IllegalArgumentException) {
+                                        Toast.makeText(context, e.message, Toast.LENGTH_LONG)
+                                            .show()
+                                    }
+
                                 }
                             }) {
                                 Icon(

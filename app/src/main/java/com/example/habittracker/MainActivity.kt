@@ -35,7 +35,6 @@ import com.example.habittracker.data.AppRepository
 import com.example.habittracker.data.Habit
 import com.example.habittracker.data.HabitLog
 import com.example.habittracker.data.User
-import com.example.habittracker.databinding.ActivityMainBinding
 import com.example.habittracker.ui.components.AdminDashboard
 import com.example.habittracker.ui.components.HabitReview
 import com.example.habittracker.ui.components.HabitTracker
@@ -47,6 +46,7 @@ import kotlinx.coroutines.launch
 class MainActivity : ComponentActivity() {
     companion object {
         const val USER_ID = "com.example.habittracker.USER_ID"
+        const val SHARED_PREFS_NAME = "HabitTrackerPrefs"
         fun createIntent(context: Context, userId: Int): Intent {
             val intent = Intent(context, MainActivity::class.java)
             intent.putExtra(USER_ID, userId)
@@ -54,7 +54,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private lateinit var binding: ActivityMainBinding
 
     private lateinit var repo: AppRepository
 
@@ -68,7 +67,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         repo = AppRepository.getInstance(this)
-        sharedPrefs = getSharedPreferences("HabitTrackerPrefs", MODE_PRIVATE)
+        sharedPrefs = getSharedPreferences(SHARED_PREFS_NAME, MODE_PRIVATE)
 
         launchApp()
     }
@@ -100,17 +99,12 @@ class MainActivity : ComponentActivity() {
                     loggedInUser = user
                     val habits = repo.getHabitByUserId(loggedInUserId)
                     val habitLogs = repo.getHabitLogsForUser(loggedInUserId)
-                    var allUsers = emptyList<User>()
-                    if (user.isAdmin) {
-                        allUsers = repo.getAllUsers()
-                    }
 
                     setContent {
                         HabitTrackerTheme {
                             MainNav(
                                 repo,
                                 user = loggedInUser as User,
-                                allUsers = allUsers,
                                 habits = habits,
                                 habitLogs = habitLogs,
                                 handleLogout = { logoutUser() }
@@ -148,7 +142,6 @@ enum class AppDestinations(
 fun MainNav(
     repo: AppRepository,
     user: User,
-    allUsers: List<User>,
     habits: List<Habit>,
     habitLogs: List<HabitLog>,
     handleLogout: () -> Unit
@@ -195,7 +188,7 @@ fun MainNav(
                     AppDestinations.PROFILE -> {
                         UserProfile(user)
                         if (user.isAdmin) {
-                            AdminDashboard(repo, allUsers)
+                            AdminDashboard(repo)
                         }
                     }
                 }
