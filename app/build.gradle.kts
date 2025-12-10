@@ -72,6 +72,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$rootProject.lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:$rootProject.lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-common-java8:$rootProject.lifecycleVersion")
+    implementation("androidx.compose.material:material-icons-extended:$rootProject.composeVersion")
     implementation("androidx.constraintlayout:constraintlayout:2.2.1")
     // To use constraintlayout in compose
     implementation("androidx.constraintlayout:constraintlayout-compose:1.1.1")
