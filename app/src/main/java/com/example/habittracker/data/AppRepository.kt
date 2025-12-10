@@ -1,7 +1,9 @@
 package com.example.habittracker.data
 
 import android.content.Context
+import com.example.habittracker.MainActivity.Companion.SHARED_PREFS_NAME
 import com.example.habittracker.MainActivity.Companion.USER_ID
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -11,7 +13,7 @@ class AppRepository @Inject constructor(
     context: Context
 ) {
     val db = AppDatabase.getDatabase(context)
-    val sharedPrefs = context.getSharedPreferences("HabitTrackerPrefs", Context.MODE_PRIVATE)
+    val sharedPrefs = context.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE)
 
     /*******************
      * User Operations *
@@ -30,12 +32,20 @@ class AppRepository @Inject constructor(
 
     fun getAllUsers() = db.userDao().getAllUsers()
 
-    suspend fun getAllHabit() = db.habitDao().getAllHabit()
 
     /********************
      * Habit Operations *
      ********************/
-    suspend fun getHabitByUserId(userId: Int) = db.habitDao().getHabitByUserId(userId)
+    fun getHabitsByUserId(userId: Int) = db.habitDao().getHabitsByUserId(userId)
+
+    fun getHabitsForLoggedInUser(): Flow<List<Habit>> {
+        val loggedInUserId = sharedPrefs.getInt(USER_ID, -1)
+        if (loggedInUserId == -1) {
+            throw IllegalArgumentException("No user is currently logged in.")
+        }
+        return db.habitDao().getHabitsByUserId(loggedInUserId)
+    }
+
 
     /***********************
      * HabitLog Operations *

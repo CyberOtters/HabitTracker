@@ -32,7 +32,6 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.edit
 import androidx.lifecycle.lifecycleScope
 import com.example.habittracker.data.AppRepository
-import com.example.habittracker.data.Habit
 import com.example.habittracker.data.HabitLog
 import com.example.habittracker.data.User
 import com.example.habittracker.ui.components.AdminDashboard
@@ -97,7 +96,6 @@ class MainActivity : ComponentActivity() {
                     finish()
                 } else {
                     loggedInUser = user
-                    val habits = repo.getHabitByUserId(loggedInUserId)
                     val habitLogs = repo.getHabitLogsForUser(loggedInUserId)
 
                     setContent {
@@ -105,7 +103,6 @@ class MainActivity : ComponentActivity() {
                             MainNav(
                                 repo,
                                 user = loggedInUser as User,
-                                habits = habits,
                                 habitLogs = habitLogs,
                                 handleLogout = { logoutUser() }
                             )
@@ -142,7 +139,6 @@ enum class AppDestinations(
 fun MainNav(
     repo: AppRepository,
     user: User,
-    habits: List<Habit>,
     habitLogs: List<HabitLog>,
     handleLogout: () -> Unit
 ) {
@@ -179,11 +175,7 @@ fun MainNav(
                 )
                 Spacer(modifier = Modifier.padding(16.dp))
                 when (currentDestination) {
-                    AppDestinations.TRACK -> HabitTracker(
-                        habits,
-                        modifier = Modifier.padding(16.dp)
-                    )
-
+                    AppDestinations.TRACK -> HabitTracker(repo)
                     AppDestinations.REVIEW -> HabitReview(habitLogs)
                     AppDestinations.PROFILE -> {
                         UserProfile(user)
