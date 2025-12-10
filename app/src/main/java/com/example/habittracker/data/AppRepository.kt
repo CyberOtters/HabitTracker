@@ -20,8 +20,13 @@ class AppRepository @Inject constructor(
      *******************/
 
     suspend fun deleteUser(user: User) {
-        if (user.userId == sharedPrefs.getInt(USER_ID, -1)) {
+        val loggedInUserId = sharedPrefs.getInt(USER_ID, -1)
+        if (user.userId == loggedInUserId) {
             throw IllegalArgumentException("Cannot delete the currently logged-in user.")
+        }
+        val loggedInUser = getUserById(loggedInUserId)
+        if (loggedInUser?.isAdmin != true) {
+            throw IllegalArgumentException("Only admin users can delete users.")
         }
         db.userDao().delete(user)
     }
