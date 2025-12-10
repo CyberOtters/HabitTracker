@@ -1,7 +1,6 @@
 package com.example.habittracker.data
 
 import android.content.Context
-import android.util.Log
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -12,6 +11,14 @@ class AppRepository @Inject constructor(
 ) {
     val db = AppDatabase.getDatabase(context)
 
+    /*******************
+     * User Operations *
+     *******************/
+
+    suspend fun deleteUser(user: User) {
+        db.userDao().delete(user)
+    }
+
     suspend fun getUserById(userId: Int) = db.userDao().getById(userId)
 
     suspend fun getUserByUsername(username: String) = db.userDao().getByUsername(username)
@@ -20,10 +27,17 @@ class AppRepository @Inject constructor(
 
     suspend fun getAllHabit() = db.habitDao().getAllHabit()
 
+    /********************
+     * Habit Operations *
+     ********************/
     suspend fun getHabitByUserId(userId: Int) = db.habitDao().getHabitByUserId(userId)
 
+    /***********************
+     * HabitLog Operations *
+     ***********************/
     suspend fun getHabitLogsForUser(userId: Int) =
         db.habitLogDao().getHabitLogsForUser(userId)
+
     companion object {
 
         // For Singleton instantiation

@@ -29,7 +29,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun habitLogDao(): HabitLogDao
 
 
-
     companion object {
         const val DATABASE_NAME = "HabitTracker.db"
         const val USER_TABLE_NAME = "User"
@@ -52,7 +51,7 @@ abstract class AppDatabase : RoomDatabase() {
 
         private fun buildDatabase(context: Context): AppDatabase {
             // remove this line to persist database between app restarts
-             context.deleteDatabase(DATABASE_NAME)
+            context.deleteDatabase(DATABASE_NAME)
 
             return Room.databaseBuilder(context, AppDatabase::class.java, DATABASE_NAME)
                 .addCallback(
@@ -85,7 +84,13 @@ abstract class AppDatabase : RoomDatabase() {
                                     cal.add(java.util.Calendar.DAY_OF_YEAR, -i)
                                     this.time = cal.timeInMillis
                                 }
-                                db.execSQL("INSERT INTO ${HABIT_LOG_TABLE_NAME} (habitId, userId, date, note, completed) VALUES (1, 1, ${NormalizedDate.from(date).utcMidnightMillis}, 'Felt good', 1)")
+                                db.execSQL(
+                                    "INSERT INTO ${HABIT_LOG_TABLE_NAME} (habitId, userId, date, note, completed) VALUES (1, 1, ${
+                                        NormalizedDate.from(
+                                            date
+                                        ).utcMidnightMillis
+                                    }, 'Felt good', 1)"
+                                )
                             }
                             // seed HabitCategories
                             db.execSQL("INSERT INTO ${HABIT_CATEGORY_TABLE_NAME} (userId, name, description) VALUES (1, 'Health', 'Habits related to health and wellness')")

@@ -2,45 +2,45 @@ package com.example.habittracker
 
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
+import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.Button
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import com.example.habittracker.ui.theme.HabitTrackerTheme
-import android.content.SharedPreferences
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.material.icons.filled.BarChart
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
-import com.example.habittracker.data.AppRepository
-import com.example.habittracker.data.User
-import com.example.habittracker.databinding.ActivityMainBinding
 import androidx.core.content.edit
 import androidx.lifecycle.lifecycleScope
+import com.example.habittracker.data.AppRepository
 import com.example.habittracker.data.Habit
 import com.example.habittracker.data.HabitLog
+import com.example.habittracker.data.User
+import com.example.habittracker.databinding.ActivityMainBinding
 import com.example.habittracker.ui.components.AdminDashboard
 import com.example.habittracker.ui.components.HabitReview
 import com.example.habittracker.ui.components.HabitTracker
 import com.example.habittracker.ui.components.UserProfile
+import com.example.habittracker.ui.theme.HabitTrackerTheme
 import kotlinx.coroutines.launch
 
 
@@ -101,13 +101,14 @@ class MainActivity : ComponentActivity() {
                     val habits = repo.getHabitByUserId(loggedInUserId)
                     val habitLogs = repo.getHabitLogsForUser(loggedInUserId)
                     var allUsers = emptyList<User>()
-                    if(user.isAdmin) {
+                    if (user.isAdmin) {
                         allUsers = repo.getAllUsers()
                     }
 
                     setContent {
                         HabitTrackerTheme {
                             MainNav(
+                                repo,
                                 user = loggedInUser as User,
                                 allUsers = allUsers,
                                 habits = habits,
@@ -145,6 +146,7 @@ enum class AppDestinations(
 
 @Composable
 fun MainNav(
+    repo: AppRepository,
     user: User,
     allUsers: List<User>,
     habits: List<Habit>,
@@ -184,12 +186,16 @@ fun MainNav(
                 )
                 Spacer(modifier = Modifier.padding(16.dp))
                 when (currentDestination) {
-                    AppDestinations.TRACK -> HabitTracker(habits, modifier = Modifier.padding(16.dp))
+                    AppDestinations.TRACK -> HabitTracker(
+                        habits,
+                        modifier = Modifier.padding(16.dp)
+                    )
+
                     AppDestinations.REVIEW -> HabitReview(habitLogs)
                     AppDestinations.PROFILE -> {
                         UserProfile(user)
-                        if (user.isAdmin){
-                            AdminDashboard(allUsers)
+                        if (user.isAdmin) {
+                            AdminDashboard(repo, allUsers)
                         }
                     }
                 }

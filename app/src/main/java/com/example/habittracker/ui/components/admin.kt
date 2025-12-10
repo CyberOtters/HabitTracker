@@ -16,11 +16,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.habittracker.data.AppRepository
 import com.example.habittracker.data.User
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 @Composable
-fun AdminDashboard(users: List<User>) {
+fun AdminDashboard(repo: AppRepository, users: List<User>) {
+    val coroutineScope = CoroutineScope(Dispatchers.Main)
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -44,7 +49,11 @@ fun AdminDashboard(users: List<User>) {
                             )
                         }
                         Column() {
-                            Button(onClick = {}) {
+                            Button(onClick = {
+                                coroutineScope.launch {
+                                    repo.deleteUser(user)
+                                }
+                            }) {
                                 Icon(
                                     imageVector = Icons.Default.Delete,
                                     contentDescription = "Delete User"
