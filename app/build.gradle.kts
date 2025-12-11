@@ -60,6 +60,7 @@ dependencies {
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.androidx.junit.ktx)
     implementation(libs.androidx.media3.test.utils)
+    implementation(libs.androidx.compose.runtime.livedata)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -72,6 +73,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$rootProject.lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:$rootProject.lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-common-java8:$rootProject.lifecycleVersion")
+    implementation("androidx.compose.material:material-icons-extended:$rootProject.composeVersion")
     implementation("androidx.constraintlayout:constraintlayout:2.2.1")
     // To use constraintlayout in compose
     implementation("androidx.constraintlayout:constraintlayout-compose:1.1.1")

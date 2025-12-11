@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface HabitDAO {
@@ -11,11 +12,9 @@ interface HabitDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(habit: Habit)
 
-    // TODO: Delete if not necessary
     @Query("SELECT * FROM ${AppDatabase.HABIT_TABLE_NAME} ORDER BY createdAt DESC")
-    suspend fun getAllHabit(): List<Habit>
+    suspend fun getAllHabits(): List<Habit>
 
     @Query("SELECT * FROM ${AppDatabase.HABIT_TABLE_NAME} WHERE userId = :userId ORDER BY createdAt DESC")
-    suspend fun getHabitByUserId(userId: Int): List<Habit>
-
+    fun getHabitsByUserId(userId: Int): Flow<List<Habit>>
 }
