@@ -13,9 +13,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -139,6 +141,7 @@ fun MainNav(
     handleLogout: () -> Unit
 ) {
     var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.TRACK) }
+    val context = androidx.compose.ui.platform.LocalContext.current
 
     NavigationSuiteScaffold(
         navigationSuiteItems = {
@@ -157,7 +160,23 @@ fun MainNav(
             }
         }
     ) {
-        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            floatingActionButton = {
+                // Show FAB only when on the TRACK screen
+                if (currentDestination == AppDestinations.TRACK) {
+                    FloatingActionButton(onClick = {
+                        val userIdAsInt = user.userId
+                        // Create an Intent to start AddHabitActivity
+                        val intent = Intent(context, AddHabitActivity::class.java)
+                        intent.putExtra("USER_ID", userIdAsInt)
+                        context.startActivity(intent)
+                    }) {
+                        Icon(Icons.Filled.Add, "Add")
+                    }
+                }
+            }
+        ) { innerPadding ->
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -169,14 +188,15 @@ fun MainNav(
                     name = user.username,
                     modifier = Modifier.padding(innerPadding)
                 )
-                Spacer(modifier = Modifier.padding(16.dp))
-                when (currentDestination) {
-                    AppDestinations.TRACK -> HabitTracker(repo)
-                    AppDestinations.REVIEW -> HabitReview(repo)
-                    AppDestinations.PROFILE -> {
-                        UserProfile(user)
-                        if (user.isAdmin) {
-                            AdminDashboard(repo)
+                Column(modifier = Modifier.weight(1f)) {
+                    when (currentDestination) {
+                        AppDestinations.TRACK -> HabitTracker(repo, user.userId)
+                        AppDestinations.REVIEW -> HabitReview(repo)
+                        AppDestinations.PROFILE -> {
+                            UserProfile(user)
+                            if (user.isAdmin) {
+                                AdminDashboard(repo)
+                            }
                         }
                     }
                 }
