@@ -43,12 +43,16 @@ class AppRepository @Inject constructor(
      ********************/
     fun getHabitsByUserId(userId: Int) = db.habitDao().getHabitsByUserId(userId)
 
-    fun getHabitsForLoggedInUser(): Flow<List<Habit>> {
+    fun getHabitsForLoggedInUser(loggedInUserId: Int): Flow<List<Habit>> {
         val loggedInUserId = sharedPrefs.getInt(USER_ID, -1)
         if (loggedInUserId == -1) {
             throw IllegalArgumentException("No user is currently logged in.")
         }
         return db.habitDao().getHabitsByUserId(loggedInUserId)
+    }
+
+    fun addHabit(habit: Habit) {
+        db.habitDao().insert(habit)
     }
 
 
@@ -65,6 +69,7 @@ class AppRepository @Inject constructor(
         }
         return db.habitLogDao().getHabitLogsForUser(loggedInUserId)
     }
+
 
     companion object {
 

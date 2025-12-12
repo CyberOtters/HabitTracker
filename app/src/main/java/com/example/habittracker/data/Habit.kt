@@ -38,10 +38,10 @@ data class Habit(
     val points : Int = 0,
 
     @ColumnInfo(defaultValue = "(strftime('%s','now') * 1000)" )
-    val createdAt: Date,
+    val createdAt: Date = Date(),
 
     @ColumnInfo(defaultValue = "(strftime('%s','now') * 1000)" )
-    val updatedAt: Date
+    val updatedAt: Date = Date(),
 ){
     init {
         require(points in -5..5) { "points must be between -5 and 5" }

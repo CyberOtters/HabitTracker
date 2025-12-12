@@ -22,11 +22,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 
 @Composable
-fun HabitTracker(repo: AppRepository) {
+fun HabitTracker(repo: AppRepository, userId: Int) {
     val coroutineScope = CoroutineScope(Dispatchers.Main)
     val context = LocalContext.current
     val habits =
-        repo.getHabitsForLoggedInUser().asLiveData().observeAsState(initial = emptyList()).value
+        repo.getHabitsForLoggedInUser(userId).asLiveData().observeAsState(initial = emptyList()).value
     HabitsList(habits)
 }
 
