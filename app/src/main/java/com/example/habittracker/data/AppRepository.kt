@@ -55,6 +55,15 @@ class AppRepository @Inject constructor(
         db.habitDao().insert(habit)
     }
 
+    fun deleteHabit(habit: Habit) {
+        db.habitDao().delete(habit)
+    }
+
+    suspend fun updateHabit(habit: Habit) {
+        db.habitDao().update(habit)
+    }
+
+
 
     /***********************
      * HabitLog Operations *

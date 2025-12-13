@@ -15,7 +15,7 @@ interface HabitDAO {
     fun insert(habit: Habit)
 
     @Delete
-    suspend fun delete(habit: Habit)
+    fun delete(habit: Habit)
 
     @Update
     suspend fun update(habit: Habit)
