@@ -15,7 +15,7 @@ interface HabitDAO {
     fun insert(habit: Habit)
 
     @Delete
-    suspend fun delete(habit: Habit)
+    fun delete(habit: Habit)
 
     @Update
     suspend fun update(habit: Habit)
@@ -23,6 +23,10 @@ interface HabitDAO {
 
     @Query("SELECT * FROM ${AppDatabase.HABIT_TABLE_NAME} ORDER BY createdAt DESC")
     suspend fun getAllHabits(): List<Habit>
+
+    @Query("SELECT * FROM ${AppDatabase.HABIT_TABLE_NAME} WHERE habitId = :habitId")
+    fun getHabitById(habitId: Int): Flow<Habit>
+
 
     @Query("SELECT * FROM ${AppDatabase.HABIT_TABLE_NAME} WHERE userId = :userId ORDER BY createdAt DESC")
     fun getHabitsByUserId(userId: Int): Flow<List<Habit>>
