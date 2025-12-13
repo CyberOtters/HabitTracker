@@ -59,6 +59,9 @@ class AppRepository @Inject constructor(
         db.habitDao().delete(habit)
     }
 
+    fun getHabitById(habitId: Int) = db.habitDao().getHabitById(habitId)
+
+
     suspend fun updateHabit(habit: Habit) {
         db.habitDao().update(habit)
     }

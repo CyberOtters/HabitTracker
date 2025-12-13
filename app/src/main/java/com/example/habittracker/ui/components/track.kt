@@ -1,5 +1,6 @@
 package com.example.habittracker.ui.components
 
+import android.content.Intent
 import androidx.activity.result.launch
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.asLiveData
+import com.example.habittracker.AddHabitActivity
 import com.example.habittracker.data.AppRepository
 import com.example.habittracker.data.Habit
 import kotlinx.coroutines.CoroutineScope
@@ -41,14 +43,22 @@ fun HabitTracker(repo: AppRepository, userId: Int) {
 
     val habits by repo.getHabitsByUserId(userId).asLiveData().observeAsState(initial = emptyList())
     val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     HabitsList(
         habits = habits,
         onDeleteHabit = { habit ->
-            // --- FIX 2: Explicitly use the IO dispatcher for the database operation ---
             coroutineScope.launch(Dispatchers.IO) {
                 repo.deleteHabit(habit)
             }
+        },
+        onEditHabit = { habit ->
+            // Launch AddHabitActivity, but pass the ID of the habit to edit
+            val intent = Intent(context, AddHabitActivity::class.java).apply {
+                putExtra("USER_ID", userId)
+                putExtra("HABIT_ID_TO_EDIT", habit.habitId)
+            }
+            context.startActivity(intent)
         }
     )
 }
@@ -56,7 +66,8 @@ fun HabitTracker(repo: AppRepository, userId: Int) {
 @Composable
 fun HabitsList(habits: List<Habit>,
                modifier: Modifier = Modifier,
-               onDeleteHabit: (Habit) -> Unit
+               onDeleteHabit: (Habit) -> Unit,
+               onEditHabit: (Habit) -> Unit
 ) {
     if (habits.isEmpty()) {
         Text(text = "No habits recorded yet.")
@@ -65,7 +76,8 @@ fun HabitsList(habits: List<Habit>,
             items(habits) { habit ->
                 HabitItem(
                     habit = habit,
-                    onDeleteClick = { onDeleteHabit(habit) }
+                    onDeleteClick = { onDeleteHabit(habit) },
+                    onEditClick = { onEditHabit(habit) }
                 )
                 Spacer(modifier = Modifier.padding(4.dp))
             }
@@ -74,7 +86,11 @@ fun HabitsList(habits: List<Habit>,
 }
 
 @Composable
-fun HabitItem(habit: Habit, onDeleteClick: () -> Unit) {
+fun HabitItem(
+    habit: Habit,
+    onDeleteClick: () -> Unit,
+    onEditClick: () -> Unit
+) {
 
     var showDialog by remember { mutableStateOf(false) }
 
@@ -112,15 +128,12 @@ fun HabitItem(habit: Habit, onDeleteClick: () -> Unit) {
                 Text(text = "Points: ${habit.points}")
                 Text(text = "Date: ${habit.createdAt}")
             }
-            // Add Edit Icon Button
-            IconButton(onClick = { /* TODO: Handle Edit Click */ }) {
+            IconButton(onClick = onEditClick) {
                 Icon(
                     imageVector = Icons.Default.Edit,
                     contentDescription = "Edit Habit"
                 )
             }
-
-            // Add Delete Icon Button
             IconButton(onClick = {
                 showDialog = true
             }) {
