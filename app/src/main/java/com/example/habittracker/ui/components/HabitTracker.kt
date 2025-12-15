@@ -23,6 +23,7 @@ fun HabitTracker(repo: AppRepository, userId: Int) {
     val habits =
         repo.getHabitsForLoggedInUser(userId).asLiveData()
             .observeAsState(initial = emptyList()).value
+
     Row(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -43,9 +44,6 @@ fun HabitTracker(repo: AppRepository, userId: Int) {
         }
     }
     for (habit in habits) {
-//        val habitLogs =
-//            repo.getHabitLogsForHabit(habit.id).asLiveData()
-//                .observeAsState(initial = emptyList()).value
         HabitWeek(habit = habit)
     }
 }
