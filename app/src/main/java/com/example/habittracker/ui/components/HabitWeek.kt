@@ -3,7 +3,7 @@ package com.example.habittracker.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,9 +21,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.asLiveData
 import com.example.habittracker.data.AppRepository
 import com.example.habittracker.data.Habit
+import com.example.habittracker.data.HabitLog
 import com.example.habittracker.utils.NormalizedDate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.Date
 import java.util.TimeZone
@@ -79,10 +81,48 @@ fun HabitWeek(
                         .aspectRatio(1f)
                         .background(color)
                         .border(1.dp, Color.White)
-                        .clickable {
-                            // Handle habit completion toggle here
-
-                        },
+                        .combinedClickable(
+                            onClick = {
+                                // handle complete toggle
+                                if (log == null) {
+                                    // create new log with completed = true
+                                    coroutineScope.launch {
+                                        repo.insertHabitLog(
+                                            habit.habitId,
+                                            habit.userId,
+                                            date = nd,
+                                            completed = true
+                                        )
+                                    }
+                                } else {
+                                    // update existing log to toggle completed status
+                                    coroutineScope.launch {
+                                        val completed: Boolean?
+                                        if (log.completed == null) {
+                                            completed = true
+                                        } else if (log.completed) {
+                                            completed = false
+                                        } else {
+                                            completed = null
+                                        }
+                                        repo.updateHabitLog(
+                                            HabitLog(
+                                                habitLogId = log.habitLogId,
+                                                habitId = log.habitId,
+                                                userId = log.userId,
+                                                date = log.date,
+                                                completed = completed,
+                                                createdAt = log.createdAt,
+                                                updatedAt = Date()
+                                            )
+                                        )
+                                    }
+                                }
+                            },
+                            onLongClick = {
+                                // add notes
+                            }
+                        ),
                     contentAlignment = Alignment.Center,
                 ) {}
             }
