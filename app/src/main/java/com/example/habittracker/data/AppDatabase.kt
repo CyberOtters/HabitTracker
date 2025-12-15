@@ -81,14 +81,10 @@ abstract class AppDatabase : RoomDatabase() {
                             val cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
                             for (day in 1..7) {
                                 cal.set(Calendar.DAY_OF_WEEK, day)
-                                val date = Date().apply {
-                                    this.time = cal.timeInMillis
-                                }
+                                val nd = NormalizedDate.from(Date(cal.timeInMillis))
                                 db.execSQL(
                                     "INSERT INTO ${HABIT_LOG_TABLE_NAME} (habitId, userId, date, note, completed) VALUES (1, 1, ${
-                                        NormalizedDate.from(
-                                            date
-                                        ).utcMidnightMillis
+                                        nd.utcMidnightMillis
                                     }, 'Felt good', 1)"
                                 )
                             }

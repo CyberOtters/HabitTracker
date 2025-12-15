@@ -41,9 +41,9 @@ fun HabitWeek(
     val cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
     cal.set(Calendar.WEEK_OF_YEAR, weekOfYear)
     cal.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY)
-    val startDate = NormalizedDate.from(Date().apply { time = cal.timeInMillis })
+    val startDate = NormalizedDate.from(Date(cal.timeInMillis))
     cal.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY)
-    val endDate = NormalizedDate.from(Date().apply { time = cal.timeInMillis })
+    val endDate = NormalizedDate.from(Date(cal.timeInMillis))
 
     val habitLogs = repo.getHabitLogsForHabit(
         habit.habitId,
@@ -65,7 +65,7 @@ fun HabitWeek(
             (1..7).map { day ->
                 cal.set(Calendar.WEEK_OF_YEAR, weekOfYear)
                 cal.set(Calendar.DAY_OF_WEEK, day)
-                val nd = NormalizedDate.from(Date().apply { time = cal.timeInMillis })
+                val nd = NormalizedDate.from(Date(cal.timeInMillis))
                 val log = habitLogsByDate[nd.utcMidnightMillis]
                 var color: Color
                 if (log == null || log.completed == null) {
