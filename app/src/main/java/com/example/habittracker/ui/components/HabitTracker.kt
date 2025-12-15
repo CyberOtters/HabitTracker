@@ -15,6 +15,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import java.util.Calendar
 import java.util.Locale
+import java.util.TimeZone
 
 @Composable
 fun HabitTracker(repo: AppRepository, userId: Int) {
@@ -27,7 +28,7 @@ fun HabitTracker(repo: AppRepository, userId: Int) {
     Row(
         modifier = Modifier.fillMaxWidth()
     ) {
-        val cal = Calendar.getInstance()
+        val cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
         (1..7).map { day ->
             Column(
                 modifier = Modifier.weight(1f),
