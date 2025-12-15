@@ -12,6 +12,7 @@ import com.example.habittracker.utils.NormalizedDate
 import com.example.habittracker.utils.hashPassword
 import java.util.Calendar
 import java.util.Date
+import java.util.TimeZone
 
 @Database(
     entities = [User::class, Habit::class, HabitLog::class, HabitCategory::class, HabitCategoryCrossRef::class],
@@ -77,11 +78,10 @@ abstract class AppDatabase : RoomDatabase() {
                             db.execSQL("INSERT INTO ${HABIT_TABLE_NAME} (name, description, points, userId) VALUES ('Read Book', 'Read for 20 minutes', 5, 1)")
 
                             // seed HabitLogs
-                            for (i in 1..5) {
+                            val cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+                            for (day in 1..7) {
+                                cal.set(Calendar.DAY_OF_WEEK, day)
                                 val date = Date().apply {
-                                    val cal = Calendar.getInstance()
-                                    cal.time = this
-                                    cal.add(java.util.Calendar.DAY_OF_YEAR, -i)
                                     this.time = cal.timeInMillis
                                 }
                                 db.execSQL(
