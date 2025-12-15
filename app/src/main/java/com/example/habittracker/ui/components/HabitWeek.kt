@@ -29,7 +29,10 @@ import java.util.Date
 import java.util.TimeZone
 
 @Composable
-fun HabitWeek(habit: Habit, weekOfYear: Int = Calendar.getInstance().get(Calendar.WEEK_OF_YEAR)) {
+fun HabitWeek(
+    habit: Habit,
+    weekOfYear: Int
+) {
     val coroutineScope = CoroutineScope(Dispatchers.Main)
     val context = LocalContext.current
     val repo = AppRepository.getInstance(context)
