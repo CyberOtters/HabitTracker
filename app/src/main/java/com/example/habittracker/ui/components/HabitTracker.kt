@@ -24,12 +24,12 @@ fun HabitTracker(repo: AppRepository, userId: Int) {
     val habits =
         repo.getHabitsForLoggedInUser(userId).asLiveData()
             .observeAsState(initial = emptyList()).value
-    val weekOfYear = Calendar.getInstance(TimeZone.getTimeZone("UTC")).get(Calendar.WEEK_OF_YEAR)
+    val cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+    val weekOfYear = cal.get(Calendar.WEEK_OF_YEAR)
 
     Row(
         modifier = Modifier.fillMaxWidth()
     ) {
-        val cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
         (1..7).map { day ->
             Column(
                 modifier = Modifier.weight(1f),
