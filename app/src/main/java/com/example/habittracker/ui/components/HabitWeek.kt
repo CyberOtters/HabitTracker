@@ -120,7 +120,7 @@ fun HabitWeek(
                                 }
                             },
                             onLongClick = {
-                                // add notes
+                                // start HabitLogActivity to add notes
                             }
                         ),
                     contentAlignment = Alignment.Center,
