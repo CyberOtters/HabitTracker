@@ -111,6 +111,7 @@ fun HabitWeek(
                                                 habitId = log.habitId,
                                                 userId = log.userId,
                                                 date = log.date,
+                                                note = log.note,
                                                 completed = completed,
                                                 createdAt = log.createdAt,
                                                 updatedAt = Date()
