@@ -37,6 +37,14 @@ interface HabitLogDao {
     //Gets all the logs for a user starting with the newest date
 
 
+    @Query("SELECT * FROM HabitLog WHERE userId = :userId AND date BETWEEN :startDate AND :endDate ORDER BY date ASC")
+    fun getHabitLogsForDateRange(
+        userId: Int,
+        startDate: NormalizedDate,
+        endDate: NormalizedDate
+    ): Flow<List<HabitLog>>
+
+
     /**
      * Gets all HabitLogs for a specified User and a specified Habit, between startDate and endDate (inclusive).
      */
@@ -47,4 +55,5 @@ interface HabitLogDao {
         startDate: NormalizedDate,
         endDate: NormalizedDate
     ): Flow<List<HabitLog>>
+
 }

@@ -79,6 +79,27 @@ class AppRepository @Inject constructor(
         return db.habitLogDao().getHabitLogsForUser(loggedInUserId)
     }
 
+    fun getHabitLogsForDateRange(
+        startDate: NormalizedDate,
+        endDate: NormalizedDate
+    ): Flow<List<HabitLog>> {
+        val loggedInUserId = getLoggedInUserId()
+        if (loggedInUserId == -1) {
+            throw IllegalArgumentException("No user is currently logged in.")
+        }
+
+        Log.i(
+            "AppRepository",
+            "Fetching habit logs for userId=${loggedInUserId}, startDate=$startDate, endDate=$endDate"
+        )
+
+        return db.habitLogDao().getHabitLogsForDateRange(
+            loggedInUserId,
+            startDate,
+            endDate
+        )
+    }
+
     fun getHabitLogsForHabit(
         habitId: Int,
         startDate: NormalizedDate,
