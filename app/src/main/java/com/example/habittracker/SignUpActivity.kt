@@ -50,7 +50,7 @@ class SignUpActivity : AppCompatActivity() {
             }
 
             val (salt, hash) = hashPassword(password)
-            val newUser = User(username = "test", isAdmin = false, passwordHash = hash, passwordSalt = salt)
+            val newUser = User(username = username, isAdmin = false, passwordHash = hash, passwordSalt = salt)
             repo.addUser(newUser)
 
             withContext(Dispatchers.Main) {
