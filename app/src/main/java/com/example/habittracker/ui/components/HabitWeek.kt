@@ -7,9 +7,15 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.IconButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
@@ -33,7 +39,9 @@ import java.util.TimeZone
 @Composable
 fun HabitWeek(
     habit: Habit,
-    weekOfYear: Int
+    weekOfYear: Int,
+    onEdit: () -> Unit,
+    onDelete: () -> Unit
 ) {
     val coroutineScope = CoroutineScope(Dispatchers.Main)
     val context = LocalContext.current
@@ -58,8 +66,17 @@ fun HabitWeek(
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
-        Row() {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Text(text = habit.name, modifier = Modifier.padding(8.dp))
+            Spacer(modifier = Modifier.weight(1f))
+            IconButton(onClick = onEdit) {
+                Icon(Icons.Filled.Edit, contentDescription = "Edit Habit")
+            }
+            IconButton(onClick = onDelete) {
+                Icon(Icons.Filled.Delete, contentDescription = "Delete Habit")
+            }
         }
         Row() {
             (1..7).map { day ->
