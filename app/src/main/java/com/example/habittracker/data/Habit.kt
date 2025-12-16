@@ -1,13 +1,13 @@
 package com.example.habittracker.data
 
 import androidx.room.ColumnInfo
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
-import androidx.room.PrimaryKey
-import androidx.room.Embedded
-import androidx.room.Relation
 import androidx.room.Junction
+import androidx.room.PrimaryKey
+import androidx.room.Relation
 import java.util.Date
 
 @Entity(
@@ -35,16 +35,16 @@ data class Habit(
 
     val description: String? = null,
 
-    val points : Int = 0,
+    val points: Int = 0,
 
-    @ColumnInfo(defaultValue = "(strftime('%s','now') * 1000)" )
+    @ColumnInfo(defaultValue = "(strftime('%s','now') * 1000)")
     val createdAt: Date = Date(),
 
-    @ColumnInfo(defaultValue = "(strftime('%s','now') * 1000)" )
+    @ColumnInfo(defaultValue = "(strftime('%s','now') * 1000)")
     val updatedAt: Date = Date(),
-){
+) {
     init {
-        require(points in -5..5) { "points must be between -5 and 5" }
+        require(points in 0..5) { "points must be between -5 and 5" }
     }
 }
 
