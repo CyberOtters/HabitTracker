@@ -1,9 +1,13 @@
 package com.example.habittracker
 import android.os.Bundle
+import android.widget.Button
+import android.widget.CheckBox
+import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import android.widget.Toast
 import com.example.habittracker.data.AppDatabase
 import com.example.habittracker.data.HabitLog
+import com.example.habittracker.utils.NormalizedDate
 
 class HabitLogActivity : AppCompatActivity() {
 
@@ -26,5 +30,14 @@ class HabitLogActivity : AppCompatActivity() {
             finish()
             return
         }
+        val date: NormalizedDate = normalizedDateFromMillis(dateMillis)
+
+        val noteEditText = findViewById<EditText>(R.id.noteEditText)
+        val completedCheckBox = findViewById<CheckBox>(R.id.completedCheckBox)
+        val saveButton = findViewById<Button>(R.id.saveButton)
+
+        val db = AppDatabase.getInstance(applicationContext)
+        val dao = db.habitLogDao()
+
     }
 }
