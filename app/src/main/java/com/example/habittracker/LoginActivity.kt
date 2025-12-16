@@ -27,6 +27,11 @@ class LoginActivity : AppCompatActivity() {
                 login()
             }
         }
+
+        binding.signUpButton.setOnClickListener {
+            val intent = Intent(this, SignUpActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     private suspend fun login() {
