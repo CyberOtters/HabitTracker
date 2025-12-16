@@ -45,6 +45,12 @@ class AppRepository @Inject constructor(
 
     fun getAllUsers() = db.userDao().getAllUsers()
 
+    suspend fun addUser(user: User) {
+        db.userDao().insert(user)
+    }
+
+
+
 
     /********************
      * Habit Operations *
