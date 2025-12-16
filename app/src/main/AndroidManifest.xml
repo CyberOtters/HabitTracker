@@ -13,6 +13,9 @@
     android:theme="@style/Theme.HabitTracker">
     <activity
       android:exported="false"
+      android:name=".SignUpActivity" />
+    <activity
+      android:exported="false"
       android:name=".AddHabitActivity" />
     <activity
       android:exported="false"

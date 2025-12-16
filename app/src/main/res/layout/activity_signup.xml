@@ -3,7 +3,9 @@
   xmlns:app="http://schemas.android.com/apk/res-auto"
   xmlns:tools="http://schemas.android.com/tools"
   android:layout_width="match_parent"
-  android:layout_height="match_parent">
+  android:layout_height="match_parent"
+  tools:context=".SignUpActivity">
+
 
   <TextView
     android:id="@+id/titleRegistrationTextView"
@@ -46,7 +48,7 @@
     app:layout_constraintTop_toBottomOf="@+id/userNameRegisterEditText" />
 
   <Button
-    android:id="@+id/signUpButton"
+    android:id="@+id/registerButton"
     android:layout_margin="16dp"
     android:text="Register"
     android:textSize="32sp"
