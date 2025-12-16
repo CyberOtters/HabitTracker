@@ -69,7 +69,7 @@ class AppRepository @Inject constructor(
         db.habitDao().insert(habit)
     }
 
-    fun deleteHabit(habit: Habit) {
+    suspend fun deleteHabit(habit: Habit) {
         db.habitDao().delete(habit)
     }
 

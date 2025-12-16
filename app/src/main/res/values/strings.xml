@@ -44,4 +44,11 @@
     quis tincidunt nisl eleifend. Cras bibendum enim a justo luctus vestibulum. Fusce dictum libero
     quis erat maximus, vitae volutpat diam dignissim.
   </string>
+  <string name="habbit_name">Habbit Name:</string>
+  <string name="enter_habit_name">Enter Habit Name...</string>
+  <string name="points">Points:</string>
+  <string name="enter_habit_name1">Enter Habit Name...</string>
+  <string name="description">Description</string>
+  <string name="enter_habit_description">Enter Habit Description...</string>
+  <string name="save">Save</string>
 </resources>

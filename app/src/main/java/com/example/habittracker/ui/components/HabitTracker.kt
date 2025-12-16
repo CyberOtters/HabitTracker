@@ -54,7 +54,6 @@ fun HabitTracker(repo: AppRepository, userId: Int) {
             habit,
             weekOfYear,
             onEdit = {
-                // Launch AddHabitActivity to edit the habit
                 val intent = Intent(context, AddHabitActivity::class.java).apply {
                     putExtra("USER_ID", userId)
                     putExtra("HABIT_ID_TO_EDIT", habit.habitId)
@@ -62,7 +61,6 @@ fun HabitTracker(repo: AppRepository, userId: Int) {
                 context.startActivity(intent)
             },
             onDelete = {
-                // Launch a coroutine to delete the habit from the database
                 coroutineScope.launch {
                     repo.deleteHabit(habit)
                 }
