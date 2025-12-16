@@ -20,7 +20,6 @@ interface HabitLogDao {
 
     @Delete
     suspend fun deleteHabitLog(habitLog: HabitLog)
-    //Removes a log entry
 
     @Query("SELECT * FROM HabitLog WHERE habitLogId = :id")
     suspend fun getHabitLogById(id: Int): HabitLog?
@@ -34,12 +33,7 @@ interface HabitLogDao {
 
     @Query("SELECT * FROM HabitLog WHERE userId = :userId ORDER BY date DESC")
     fun getHabitLogsForUser(userId: Int): Flow<List<HabitLog>>
-    //Gets all the logs for a user starting with the newest date
 
-
-    /**
-     * Gets all HabitLogs for a specified User and a specified Habit, between startDate and endDate (inclusive).
-     */
     @Query("SELECT * FROM HabitLog WHERE userId = :userId AND habitId = :habitId AND date BETWEEN :startDate AND :endDate ORDER BY date ASC")
     fun getHabitLogsForHabit(
         userId: Int,
@@ -47,4 +41,34 @@ interface HabitLogDao {
         startDate: NormalizedDate,
         endDate: NormalizedDate
     ): Flow<List<HabitLog>>
+
+    @Query("""
+        SELECT 
+            hl.habitLogId AS habitLogId,
+            hl.date AS date,
+            h.name AS activity,
+            hl.completed AS completed,
+            hl.note AS note
+        FROM HabitLog AS hl
+        INNER JOIN Habit AS h
+            ON h.habitId = hl.habitId
+        WHERE hl.userId = :userId
+        ORDER BY hl.date DESC, h.name ASC
+    """)
+    fun getHabitLogRowsForUser(userId: Int): Flow<List<HabitLogRow>>
+
+    @Query("""
+        SELECT 
+            hl.habitLogId AS habitLogId,
+            hl.date AS date,
+            h.name AS activity,
+            hl.completed AS completed,
+            hl.note AS note
+        FROM HabitLog AS hl
+        INNER JOIN Habit AS h
+            ON h.habitId = hl.habitId
+        WHERE hl.userId = :userId AND hl.habitId = :habitId
+        ORDER BY hl.date DESC
+    """)
+    fun getHabitLogRowsForHabit(userId: Int, habitId: Int): Flow<List<HabitLogRow>>
 }
