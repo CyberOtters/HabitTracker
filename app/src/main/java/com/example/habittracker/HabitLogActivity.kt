@@ -3,11 +3,11 @@ package com.example.habittracker
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.widget.EditText
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.habittracker.data.AppRepository
+import com.example.habittracker.data.Habit
+import com.example.habittracker.data.HabitLog
 import com.example.habittracker.databinding.ActivityHabitLogBinding
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -33,39 +33,47 @@ class HabitLogActivity : AppCompatActivity() {
     private lateinit var binding: ActivityHabitLogBinding
     private lateinit var repo: AppRepository
 
+    private lateinit var habitLog: HabitLog
+    private lateinit var habit: Habit
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityHabitLogBinding.inflate(layoutInflater)
         repo = AppRepository.getInstance(this)
-        setContentView(binding.root)
-
+        val habitLogId = intent.getIntExtra(EXTRA_HABIT_LOG_ID, -1)
         val userId = repo.getLoggedInUserId()
         if (userId == -1) {
             throw IllegalStateException("No logged in user")
         }
 
-
+        binding.saveNoteButton.setOnClickListener {
+            val note = binding.noteEditText.text.toString()
+            saveNote(habitLogId, note)
+            finish()
+        }
 
         lifecycleScope.launch {
-
-        }
-    }
-
-    private fun showEditNoteDialog(initialNote: String?, onSave: (String?) -> Unit) {
-        val editText = EditText(this).apply {
-            setText(initialNote.orEmpty())
-            hint = "Enter Note..."
-        }
-
-        AlertDialog.Builder(this)
-            .setTitle("Edit Note")
-            .setView(editText)
-            .setNegativeButton("Cancel", null)
-            .setPositiveButton("Save") { _, _ ->
-                val cleaned = editText.text?.toString()?.trim()?.takeIf { it.isNotEmpty() }
-                onSave(cleaned)
+            habitLog = repo.getHabitLogById(habitLogId).let { habitLog ->
+                habitLog ?: throw IllegalArgumentException("No HabitLog found with ID $habitLogId")
             }
-            .show()
+            habit = repo.getHabitById(habitLog.habitId).let { habit ->
+                habit
+                    ?: throw IllegalArgumentException("No Habit found with ID ${habitLog.habitId}")
+            }
+
+            binding.habitName.setText(habit.name)
+            binding.noteEditText.setText(habitLog.note)
+            binding.dateTextView.setText(dateFormatter.format(habitLog.date.toDate()))
+            setContentView(binding.root)
+        }
+
+
     }
 
+    private fun saveNote(habitLogId: Int, note: String) {
+        lifecycleScope.launch {
+            val updatedLog = habitLog.copy(note = note)
+            repo.updateHabitLog(updatedLog)
+        }
+    }
 }
