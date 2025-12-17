@@ -9,7 +9,7 @@
   tools:context=".HabitLogActivity">
 
   <Button
-    android:id="@+id/signUpButton"
+    android:id="@+id/saveNoteButton"
     android:layout_width="136dp"
     android:layout_height="71dp"
     android:layout_margin="16dp"
@@ -18,9 +18,30 @@
     android:textSize="18sp"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@+id/noteTextView" />
+    app:layout_constraintTop_toBottomOf="@+id/noteEditText" />
 
 
+  <EditText
+    android:id="@+id/noteEditText"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="top|start"
+    android:hint="Enter a note here"
+    android:inputType="textMultiLine"
+    android:maxLines="6"
+    android:minLines="3"
+    app:layout_constraintTop_toBottomOf="@+id/dateTextView" />
+
+  <TextView
+    android:id="@+id/dateTextView"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:text="Dec 16, 2025"
+    android:textAlignment="center"
+    android:textSize="18sp"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@+id/habitName" />
   <TextView
     android:id="@+id/habitName"
     android:layout_width="153dp"
@@ -34,30 +55,6 @@
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toBottomOf="@+id/titleHabitLogTextView" />
-
-  <TextView
-    android:id="@+id/dateTextView"
-    android:layout_width="0dp"
-    android:layout_height="wrap_content"
-    android:text="Dec 16, 2025"
-    android:textAlignment="center"
-    android:textSize="18sp"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@+id/habitName" />
-  <TextView
-    android:id="@+id/noteTextView"
-    android:layout_width="361dp"
-    android:layout_height="157dp"
-    android:layout_marginTop="10dp"
-    android:layout_marginStart="8dp"
-    android:text="Felt good"
-    android:textSize="16sp"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintHorizontal_bias="0.5"
-    app:layout_constraintStart_toEndOf="@+id/editNoteButton"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@+id/dateTextView" />
 
   <TextView
     android:id="@+id/titleHabitLogTextView"
