@@ -25,7 +25,7 @@ interface HabitDAO {
     suspend fun getAllHabits(): List<Habit>
 
     @Query("SELECT * FROM ${AppDatabase.HABIT_TABLE_NAME} WHERE habitId = :habitId")
-    fun getHabitById(habitId: Int): Flow<Habit>
+    suspend fun getHabitById(habitId: Int): Habit?
 
 
     @Query("SELECT * FROM ${AppDatabase.HABIT_TABLE_NAME} WHERE userId = :userId ORDER BY createdAt DESC")

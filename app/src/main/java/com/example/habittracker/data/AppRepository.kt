@@ -91,13 +91,12 @@ class AppRepository @Inject constructor(
         db.habitDao().delete(habit)
     }
 
-    fun getHabitById(habitId: Int) = db.habitDao().getHabitById(habitId)
+    suspend fun getHabitById(habitId: Int) = db.habitDao().getHabitById(habitId)
 
 
     suspend fun updateHabit(habit: Habit) {
         db.habitDao().update(habit)
     }
-
 
 
     /***********************
@@ -113,6 +112,10 @@ class AppRepository @Inject constructor(
         }
 
         return db.habitLogDao().getHabitLogsForUser(loggedInUserId)
+    }
+
+    suspend fun getHabitLogById(habitLogId: Int): HabitLog? {
+        return db.habitLogDao().getHabitLogById(habitLogId)
     }
 
     fun getHabitLogsForDateRange(
@@ -164,9 +167,9 @@ class AppRepository @Inject constructor(
         userId: Int,
         date: NormalizedDate,
         completed: Boolean?
-    ) {
+    ): Int {
         val now = Date()
-        db.habitLogDao().insertHabitLog(
+        val habitLogId = db.habitLogDao().insertHabitLog(
             HabitLog(
                 habitLogId = 0,
                 habitId = habitId,
@@ -177,6 +180,8 @@ class AppRepository @Inject constructor(
                 updatedAt = now
             )
         )
+        Log.i("AppRepository", "Inserted HabitLog with ID $habitLogId")
+        return habitLogId.toInt()
     }
 
     suspend fun updateHabitLog(habitLog: HabitLog) {
