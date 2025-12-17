@@ -91,7 +91,7 @@ class AppRepository @Inject constructor(
         db.habitDao().delete(habit)
     }
 
-    fun getHabitById(habitId: Int) = db.habitDao().getHabitById(habitId)
+    suspend fun getHabitById(habitId: Int) = db.habitDao().getHabitById(habitId)
 
 
     suspend fun updateHabit(habit: Habit) {
@@ -112,6 +112,10 @@ class AppRepository @Inject constructor(
         }
 
         return db.habitLogDao().getHabitLogsForUser(loggedInUserId)
+    }
+
+    suspend fun getHabitLogById(habitLogId: Int): HabitLog? {
+        return db.habitLogDao().getHabitLogById(habitLogId)
     }
 
     fun getHabitLogsForDateRange(
