@@ -20,7 +20,6 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.habittracker.data.AppDatabase
 import com.example.habittracker.data.HabitLog
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.util.Date
 
@@ -30,6 +29,12 @@ class HabitLogActivity : AppCompatActivity() {
         private const val EXTRA_USER_ID = "extra_user_id"
         private const val EXTRA_HABIT_ID = "extra_habit_id"
         private const val EXTRA_HABIT_NAME = "extra_habit_name"
+
+        fun intentFactory(context: Context, userId: Int): Intent {
+            return Intent(context, HabitLogActivity::class.java).apply {
+                putExtra(EXTRA_USER_ID, userId)
+            }
+        }
 
         fun intentFactory(context: Context, userId: Int, habitId: Int, habitName: String): Intent {
             return Intent(context, HabitLogActivity::class.java).apply {
@@ -50,15 +55,13 @@ class HabitLogActivity : AppCompatActivity() {
                 ?: intent.getIntExtra("USER_ID", -1).takeIf { it > 0 }
                 ?: run { finish(); return }
 
-        val habitId = intent.getIntExtra(EXTRA_HABIT_ID, -1)
-        if (habitId <= 0) {
-            finish()
-            return
-        }
+        val habitId: Int = intent.getIntExtra(EXTRA_HABIT_ID, -1)
+        val habitName: String = intent.getStringExtra(EXTRA_HABIT_NAME).orEmpty()
 
-        val habitName = intent.getStringExtra(EXTRA_HABIT_NAME).orEmpty()
+        val isSingleHabit = habitId > 0
+
         findViewById<TextView>(R.id.titleHabitLogTextView).text =
-            if (habitName.isNotBlank()) "$habitName Logs" else "Habit Logs"
+            if (isSingleHabit && habitName.isNotBlank()) "$habitName Logs" else "Habit Logs"
 
         val dao = AppDatabase.getDatabase(applicationContext).habitLogDao()
 
@@ -66,7 +69,7 @@ class HabitLogActivity : AppCompatActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         val adapter = HabitLogAdapter(
-            activityLabel = if (habitName.isNotBlank()) habitName else "Habit $habitId",
+            singleHabitName = habitName.takeIf { isSingleHabit && it.isNotBlank() },
             onLongClick = { log ->
                 showEditNoteDialog(log.note) { newNote ->
                     lifecycleScope.launch {
@@ -85,8 +88,10 @@ class HabitLogActivity : AppCompatActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 dao.getHabitLogsForUser(userId).collect { allLogs: List<HabitLog> ->
-                    val filtered: List<HabitLog> = allLogs.filter { log -> log.habitId == habitId }
-                    adapter.submitList(filtered)
+                    val listToShow =
+                        if (isSingleHabit) allLogs.filter { log -> log.habitId == habitId }
+                        else allLogs
+                    adapter.submitList(listToShow)
                 }
             }
         }
@@ -110,7 +115,7 @@ class HabitLogActivity : AppCompatActivity() {
     }
 
     private class HabitLogAdapter(
-        private val activityLabel: String,
+        private val singleHabitName: String?,
         private val onLongClick: (HabitLog) -> Unit
     ) : ListAdapter<HabitLog, HabitLogAdapter.VH>(Diff()) {
 
@@ -138,7 +143,7 @@ class HabitLogActivity : AppCompatActivity() {
             val log = getItem(position)
 
             holder.dateText.text = log.date.toString()
-            holder.activityText.text = activityLabel
+            holder.activityText.text = singleHabitName ?: "Habit ${log.habitId}"
             holder.check.visibility = if (log.completed == true) View.VISIBLE else View.GONE
 
             holder.itemView.setOnLongClickListener {
