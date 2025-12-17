@@ -6,10 +6,12 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.habittracker.data.AppRepository
 import com.example.habittracker.data.Habit
 import com.example.habittracker.databinding.ActivityAddHabitBinding
+import com.example.habittracker.utils.NormalizedDate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Date
 
 class AddHabitActivity : AppCompatActivity() {
 
@@ -17,26 +19,24 @@ class AddHabitActivity : AppCompatActivity() {
     private lateinit var repo: AppRepository
     private var userId: Int = -1
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         binding = ActivityAddHabitBinding.inflate(layoutInflater)
-        repo = AppRepository.getInstance(this)
         setContentView(binding.root)
 
+        repo = AppRepository.getInstance(this)
         userId = intent.getIntExtra("USER_ID", -1)
 
         binding.saveButton.setOnClickListener {
             saveHabit()
         }
-
-
     }
 
     private fun saveHabit() {
-        val habitName = binding.habitNameEditText.text.toString()
+        val habitName = binding.habitNameEditText.text.toString().trim()
         val habitPoints = binding.habitPointsEditText.text.toString().toIntOrNull()
-        val habitDescription = binding.habitDescriptionEditText.text.toString()
+        val habitDescription = binding.habitDescriptionEditText.text.toString().trim()
 
         if (habitName.isBlank() || habitPoints == null || habitDescription.isBlank()) {
             Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_LONG).show()
@@ -54,14 +54,21 @@ class AddHabitActivity : AppCompatActivity() {
             description = habitDescription,
             userId = userId
         )
+
         CoroutineScope(Dispatchers.IO).launch {
-            repo.addHabit(newHabit)
+            val newHabitId = repo.addHabit(newHabit).toInt()
+
+            repo.insertHabitLog(
+                habitId = newHabitId,
+                userId = userId,
+                date = NormalizedDate.from(Date()),
+                completed = null
+            )
 
             withContext(Dispatchers.Main) {
                 Toast.makeText(this@AddHabitActivity, "Habit Saved!", Toast.LENGTH_SHORT).show()
                 finish()
             }
         }
-
-        }
+    }
 }

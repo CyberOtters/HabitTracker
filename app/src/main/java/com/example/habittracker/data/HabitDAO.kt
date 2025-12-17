@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 interface HabitDAO {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(habit: Habit)
+    fun insert(habit: Habit): Long
 
     @Delete
     suspend fun delete(habit: Habit)

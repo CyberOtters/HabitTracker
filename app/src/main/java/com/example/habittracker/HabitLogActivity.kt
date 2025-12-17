@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
@@ -20,29 +21,28 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.habittracker.data.AppDatabase
 import com.example.habittracker.data.HabitLog
+import com.example.habittracker.data.HabitLogRow
+import com.example.habittracker.utils.NormalizedDate
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 
 class HabitLogActivity : AppCompatActivity() {
 
     companion object {
         private const val EXTRA_USER_ID = "extra_user_id"
-        private const val EXTRA_HABIT_ID = "extra_habit_id"
-        private const val EXTRA_HABIT_NAME = "extra_habit_name"
 
         fun intentFactory(context: Context, userId: Int): Intent {
             return Intent(context, HabitLogActivity::class.java).apply {
                 putExtra(EXTRA_USER_ID, userId)
             }
         }
+    }
 
-        fun intentFactory(context: Context, userId: Int, habitId: Int, habitName: String): Intent {
-            return Intent(context, HabitLogActivity::class.java).apply {
-                putExtra(EXTRA_USER_ID, userId)
-                putExtra(EXTRA_HABIT_ID, habitId)
-                putExtra(EXTRA_HABIT_NAME, habitName)
-            }
-        }
+    private val dateFormatter = SimpleDateFormat("MMM d, yyyy", Locale.getDefault()).apply {
+        timeZone = TimeZone.getTimeZone("UTC")
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,26 +55,19 @@ class HabitLogActivity : AppCompatActivity() {
                 ?: intent.getIntExtra("USER_ID", -1).takeIf { it > 0 }
                 ?: run { finish(); return }
 
-        val habitId: Int = intent.getIntExtra(EXTRA_HABIT_ID, -1)
-        val habitName: String = intent.getStringExtra(EXTRA_HABIT_NAME).orEmpty()
-
-        val isSingleHabit = habitId > 0
-
-        findViewById<TextView>(R.id.titleHabitLogTextView).text =
-            if (isSingleHabit && habitName.isNotBlank()) "$habitName Logs" else "Habit Logs"
-
         val dao = AppDatabase.getDatabase(applicationContext).habitLogDao()
 
         val recyclerView = findViewById<RecyclerView>(R.id.habitLogRecyclerView)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         val adapter = HabitLogAdapter(
-            singleHabitName = habitName.takeIf { isSingleHabit && it.isNotBlank() },
-            onLongClick = { log ->
-                showEditNoteDialog(log.note) { newNote ->
+            formatDate = { nd -> dateFormatter.format(Date(nd.utcMidnightMillis)) },
+            onEdit = { row ->
+                showEditNoteDialog(row.note) { newNote ->
                     lifecycleScope.launch {
+                        val entity: HabitLog = dao.getHabitLogById(row.habitLogId) ?: return@launch
                         dao.updateHabitLog(
-                            log.copy(
+                            entity.copy(
                                 note = newNote,
                                 updatedAt = Date()
                             )
@@ -87,11 +80,8 @@ class HabitLogActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                dao.getHabitLogsForUser(userId).collect { allLogs: List<HabitLog> ->
-                    val listToShow =
-                        if (isSingleHabit) allLogs.filter { log -> log.habitId == habitId }
-                        else allLogs
-                    adapter.submitList(listToShow)
+                dao.getHabitLogRowsForUser(userId).collect { rows: List<HabitLogRow> ->
+                    adapter.submitList(rows)
                 }
             }
         }
@@ -115,21 +105,23 @@ class HabitLogActivity : AppCompatActivity() {
     }
 
     private class HabitLogAdapter(
-        private val singleHabitName: String?,
-        private val onLongClick: (HabitLog) -> Unit
-    ) : ListAdapter<HabitLog, HabitLogAdapter.VH>(Diff()) {
+        private val formatDate: (NormalizedDate) -> String,
+        private val onEdit: (HabitLogRow) -> Unit
+    ) : ListAdapter<HabitLogRow, HabitLogAdapter.VH>(Diff()) {
 
         class VH(itemView: View) : RecyclerView.ViewHolder(itemView) {
             val dateText: TextView = itemView.findViewById(R.id.dateTextView)
             val activityText: TextView = itemView.findViewById(R.id.activityTextView)
+            val noteText: TextView = itemView.findViewById(R.id.noteTextView)
+            val editBtn: ImageButton = itemView.findViewById(R.id.editNoteButton)
             val check: ImageView = itemView.findViewById(R.id.completedImageView)
         }
 
-        class Diff : DiffUtil.ItemCallback<HabitLog>() {
-            override fun areItemsTheSame(oldItem: HabitLog, newItem: HabitLog) =
+        class Diff : DiffUtil.ItemCallback<HabitLogRow>() {
+            override fun areItemsTheSame(oldItem: HabitLogRow, newItem: HabitLogRow) =
                 oldItem.habitLogId == newItem.habitLogId
 
-            override fun areContentsTheSame(oldItem: HabitLog, newItem: HabitLog) =
+            override fun areContentsTheSame(oldItem: HabitLogRow, newItem: HabitLogRow) =
                 oldItem == newItem
         }
 
@@ -140,16 +132,14 @@ class HabitLogActivity : AppCompatActivity() {
         }
 
         override fun onBindViewHolder(holder: VH, position: Int) {
-            val log = getItem(position)
+            val row = getItem(position)
 
-            holder.dateText.text = log.date.toString()
-            holder.activityText.text = singleHabitName ?: "Habit ${log.habitId}"
-            holder.check.visibility = if (log.completed == true) View.VISIBLE else View.GONE
+            holder.dateText.text = formatDate(row.date)
+            holder.activityText.text = row.activity
+            holder.noteText.text = row.note ?: ""
+            holder.check.visibility = if (row.completed == true) View.VISIBLE else View.GONE
 
-            holder.itemView.setOnLongClickListener {
-                onLongClick(log)
-                true
-            }
+            holder.editBtn.setOnClickListener { onEdit(row) }
         }
     }
 }

@@ -59,8 +59,8 @@ class AppRepository @Inject constructor(
         return db.habitDao().getHabitsByUserId(loggedInUserId)
     }
 
-    fun addHabit(habit: Habit) {
-        db.habitDao().insert(habit)
+    suspend fun addHabit(habit: Habit): Long {
+        return db.habitDao().insert(habit)
     }
 
 
