@@ -171,7 +171,7 @@ fun MainNav(
                 Column(modifier = Modifier.weight(1f)) {
                     when (currentDestination) {
                         AppDestinations.TRACK -> HabitTracker(repo, user.userId)
-                        AppDestinations.REVIEW -> HabitReview(repo, user.userId)
+                        AppDestinations.REVIEW -> HabitReview(repo)
                         AppDestinations.PROFILE -> {
                             UserProfile(user)
                             if (user.isAdmin) AdminDashboard(repo)

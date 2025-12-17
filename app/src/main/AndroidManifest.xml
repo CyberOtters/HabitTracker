@@ -18,6 +18,9 @@
 
     <activity
       android:exported="false"
+      android:name=".SignUpActivity" />
+    <activity
+      android:exported="false"
       android:name=".AddHabitActivity" />
 
     <activity

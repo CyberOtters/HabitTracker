@@ -26,8 +26,8 @@ data class User(
     val passwordSalt: String,
 
     @ColumnInfo(defaultValue = "(strftime('%s','now') * 1000)" )
-    val createdAt: Date,
+    val createdAt: Date = Date(),
 
     @ColumnInfo(defaultValue = "(strftime('%s','now') * 1000)" )
-    val updatedAt: Date
+    val updatedAt: Date = Date()
 )

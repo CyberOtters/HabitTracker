@@ -5,6 +5,7 @@ import android.util.Log
 import com.example.habittracker.MainActivity.Companion.SHARED_PREFS_NAME
 import com.example.habittracker.MainActivity.Companion.USER_ID
 import com.example.habittracker.utils.NormalizedDate
+import com.example.habittracker.utils.hashPassword
 import kotlinx.coroutines.flow.Flow
 import java.util.Date
 import javax.inject.Inject
@@ -27,6 +28,25 @@ class AppRepository @Inject constructor(
         return sharedPrefs.getInt(USER_ID, -1)
     }
 
+    suspend fun getLoggedInUser(): User? {
+        val userId = getLoggedInUserId()
+        if (userId == -1) {
+            return null
+        }
+        return getUserById(userId)
+    }
+
+    suspend fun updateUserPassword(userId: Int, newPassword: String) {
+        val user = getUserById(userId)
+            ?: throw IllegalArgumentException("User with ID $userId does not exist.")
+        val (newSalt, newHash) = hashPassword(newPassword)
+        val updatedUser = user.copy(
+            passwordSalt = newSalt,
+            passwordHash = newHash
+        )
+        db.userDao().update(updatedUser)
+    }
+
     suspend fun deleteUser(user: User) {
         val loggedInUserId = sharedPrefs.getInt(USER_ID, -1)
         if (user.userId == loggedInUserId) {
@@ -44,6 +64,10 @@ class AppRepository @Inject constructor(
     suspend fun getUserByUsername(username: String) = db.userDao().getByUsername(username)
 
     fun getAllUsers() = db.userDao().getAllUsers()
+
+    suspend fun addUser(user: User) {
+        db.userDao().insert(user)
+    }
 
 
     /********************
@@ -63,6 +87,18 @@ class AppRepository @Inject constructor(
         return db.habitDao().insert(habit)
     }
 
+    suspend fun deleteHabit(habit: Habit) {
+        db.habitDao().delete(habit)
+    }
+
+    fun getHabitById(habitId: Int) = db.habitDao().getHabitById(habitId)
+
+
+    suspend fun updateHabit(habit: Habit) {
+        db.habitDao().update(habit)
+    }
+
+
 
     /***********************
      * HabitLog Operations *
@@ -77,6 +113,27 @@ class AppRepository @Inject constructor(
         }
 
         return db.habitLogDao().getHabitLogsForUser(loggedInUserId)
+    }
+
+    fun getHabitLogsForDateRange(
+        startDate: NormalizedDate,
+        endDate: NormalizedDate
+    ): Flow<List<HabitLog>> {
+        val loggedInUserId = getLoggedInUserId()
+        if (loggedInUserId == -1) {
+            throw IllegalArgumentException("No user is currently logged in.")
+        }
+
+        Log.i(
+            "AppRepository",
+            "Fetching habit logs for userId=${loggedInUserId}, startDate=$startDate, endDate=$endDate"
+        )
+
+        return db.habitLogDao().getHabitLogsForDateRange(
+            loggedInUserId,
+            startDate,
+            endDate
+        )
     }
 
     fun getHabitLogsForHabit(

@@ -1,5 +1,6 @@
 package com.example.habittracker.ui.components
 
+import android.content.Intent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,9 +11,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.asLiveData
+import com.example.habittracker.AddHabitActivity
 import com.example.habittracker.data.AppRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.Locale
 import java.util.TimeZone
@@ -46,6 +49,21 @@ fun HabitTracker(repo: AppRepository, userId: Int) {
         }
     }
     for (habit in habits) {
-        HabitWeek(habit, weekOfYear)
+        HabitWeek(
+            habit,
+            weekOfYear,
+            onEdit = {
+                val intent = Intent(context, AddHabitActivity::class.java).apply {
+                    putExtra("USER_ID", userId)
+                    putExtra("HABIT_ID_TO_EDIT", habit.habitId)
+                }
+                context.startActivity(intent)
+            },
+            onDelete = {
+                coroutineScope.launch {
+                    repo.deleteHabit(habit)
+                }
+            }
+        )
     }
 }
