@@ -3,14 +3,11 @@ package com.example.habittracker
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.ui.semantics.setText
 import androidx.lifecycle.lifecycleScope
 import com.example.habittracker.data.AppRepository
 import com.example.habittracker.data.Habit
 import com.example.habittracker.databinding.ActivityAddHabitBinding
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -33,12 +30,10 @@ class AddHabitActivity : AppCompatActivity() {
 
         if (habitIdToEdit != -1) {
             lifecycleScope.launch {
-                repo.getHabitById(habitIdToEdit).firstOrNull()?.let { habit ->
-                    habitToEdit = habit
-                    binding.habitNameEditText.setText(habit.name)
-                    binding.habitPointsEditText.setText(habit.points.toString())
-                    binding.habitDescriptionEditText.setText(habit.description)
-                }
+                habitToEdit = repo.getHabitById(habitIdToEdit)
+                binding.habitNameEditText.setText(habitToEdit?.name)
+                binding.habitPointsEditText.setText(habitToEdit?.points.toString())
+                binding.habitDescriptionEditText.setText(habitToEdit?.description)
             }
         }
 
@@ -59,8 +54,17 @@ class AddHabitActivity : AppCompatActivity() {
             return
         }
 
+        if (habitPoints < 0 || habitPoints > 5) {
+            Toast.makeText(this, "Points must be between 0 and 5", Toast.LENGTH_LONG).show()
+            return
+        }
+
         if (userId == -1) {
-            Toast.makeText(this, "Error: Could not save habit. User ID is missing.", Toast.LENGTH_LONG).show()
+            Toast.makeText(
+                this,
+                "Error: Could not save habit. User ID is missing.",
+                Toast.LENGTH_LONG
+            ).show()
             return
         }
 
