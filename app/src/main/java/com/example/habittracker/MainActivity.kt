@@ -8,7 +8,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -30,6 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.edit
 import androidx.lifecycle.lifecycleScope
@@ -42,25 +42,23 @@ import com.example.habittracker.ui.components.UserProfile
 import com.example.habittracker.ui.theme.HabitTrackerTheme
 import kotlinx.coroutines.launch
 
-
 class MainActivity : ComponentActivity() {
+
     companion object {
         const val USER_ID = "com.example.habittracker.USER_ID"
         const val SHARED_PREFS_NAME = "HabitTrackerPrefs"
+
         fun createIntent(context: Context, userId: Int): Intent {
-            val intent = Intent(context, MainActivity::class.java)
-            intent.putExtra(USER_ID, userId)
-            return intent
+            return Intent(context, MainActivity::class.java).apply {
+                putExtra(USER_ID, userId)
+            }
         }
     }
 
-
     private lateinit var repo: AppRepository
-
     private lateinit var sharedPrefs: SharedPreferences
 
     private var loggedInUserId = -1
-
     private var loggedInUser: User? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,54 +70,46 @@ class MainActivity : ComponentActivity() {
         launchApp()
     }
 
-    fun launchApp() {
+    private fun launchApp() {
         if (intent.hasExtra(USER_ID)) {
             loggedInUserId = intent.getIntExtra(USER_ID, -1)
-            // save to shared preferences
-            sharedPrefs.edit {
-                putInt(USER_ID, loggedInUserId)
-            }
+            sharedPrefs.edit { putInt(USER_ID, loggedInUserId) }
         } else if (sharedPrefs.contains(USER_ID)) {
             loggedInUserId = sharedPrefs.getInt(USER_ID, -1)
         }
 
         if (loggedInUserId == -1) {
-            val intent = LoginActivity.createIntent(this)
-            startActivity(intent)
+            startActivity(LoginActivity.createIntent(this))
             finish()
-        } else {
-            lifecycleScope.launch {
-                val user = repo.getUserById(loggedInUserId)
-                if (user == null) {
-                    // user not found, redirect to login
-                    val intent = LoginActivity.createIntent(this@MainActivity)
-                    startActivity(intent)
-                    finish()
-                } else {
-                    loggedInUser = user
-                    
-                    setContent {
-                        HabitTrackerTheme {
-                            MainNav(
-                                repo,
-                                user = loggedInUser as User,
-                                handleLogout = { logoutUser() }
-                            )
-                        }
-                    }
+            return
+        }
+
+        lifecycleScope.launch {
+            val user = repo.getUserById(loggedInUserId)
+            if (user == null) {
+                startActivity(LoginActivity.createIntent(this@MainActivity))
+                finish()
+                return@launch
+            }
+
+            loggedInUser = user
+
+            setContent {
+                HabitTrackerTheme {
+                    MainNav(
+                        repo = repo,
+                        user = user,
+                        handleLogout = { logoutUser() }
+                    )
                 }
             }
         }
     }
 
-
-    fun logoutUser() {
+    private fun logoutUser() {
         loggedInUserId = -1
-        sharedPrefs.edit {
-            remove(USER_ID)
-        }
-        val intent = LoginActivity.createIntent(this)
-        startActivity(intent)
+        sharedPrefs.edit { remove(USER_ID) }
+        startActivity(LoginActivity.createIntent(this))
         finish()
     }
 }
@@ -128,11 +118,10 @@ enum class AppDestinations(
     val label: String,
     val icon: ImageVector,
 ) {
-    TRACK("Track", Icons.Default.Check),
-    REVIEW("Review", Icons.Default.BarChart),
-    PROFILE("Profile", Icons.Default.AccountBox),
+    TRACK("Track", Icons.Filled.Check),
+    REVIEW("Review", Icons.Filled.BarChart),
+    PROFILE("Profile", Icons.Filled.AccountBox),
 }
-
 
 @Composable
 fun MainNav(
@@ -141,21 +130,16 @@ fun MainNav(
     handleLogout: () -> Unit
 ) {
     var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.TRACK) }
-    val context = androidx.compose.ui.platform.LocalContext.current
+    val context = LocalContext.current
 
     NavigationSuiteScaffold(
         navigationSuiteItems = {
-            AppDestinations.entries.forEach {
+            AppDestinations.entries.forEach { dest ->
                 item(
-                    icon = {
-                        Icon(
-                            it.icon,
-                            contentDescription = it.label
-                        )
-                    },
-                    label = { Text(it.label) },
-                    selected = it == currentDestination,
-                    onClick = { currentDestination = it }
+                    icon = { Icon(dest.icon, contentDescription = dest.label) },
+                    label = { Text(dest.label) },
+                    selected = dest == currentDestination,
+                    onClick = { currentDestination = dest }
                 )
             }
         }
@@ -163,16 +147,14 @@ fun MainNav(
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             floatingActionButton = {
-                // Show FAB only when on the TRACK screen
                 if (currentDestination == AppDestinations.TRACK) {
                     FloatingActionButton(onClick = {
-                        val userIdAsInt = user.userId
-                        // Create an Intent to start AddHabitActivity
-                        val intent = Intent(context, AddHabitActivity::class.java)
-                        intent.putExtra("USER_ID", userIdAsInt)
+                        val intent = Intent(context, AddHabitActivity::class.java).apply {
+                            putExtra("USER_ID", user.userId)
+                        }
                         context.startActivity(intent)
                     }) {
-                        Icon(Icons.Filled.Add, "Add")
+                        Icon(Icons.Filled.Add, contentDescription = "Add")
                     }
                 }
             }
@@ -184,19 +166,15 @@ fun MainNav(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Greeting(
-                    name = user.username,
-                    modifier = Modifier.padding(innerPadding)
-                )
+                Greeting(name = user.username, modifier = Modifier.padding(16.dp))
+
                 Column(modifier = Modifier.weight(1f)) {
                     when (currentDestination) {
                         AppDestinations.TRACK -> HabitTracker(repo, user.userId)
                         AppDestinations.REVIEW -> HabitReview(repo)
                         AppDestinations.PROFILE -> {
                             UserProfile(user)
-                            if (user.isAdmin) {
-                                AdminDashboard(repo)
-                            }
+                            if (user.isAdmin) AdminDashboard(repo)
                         }
                     }
                 }
@@ -207,20 +185,14 @@ fun MainNav(
     }
 }
 
-
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
+    Text(text = "Hello $name!", modifier = modifier)
 }
 
 @Composable
 fun LogoutButton(handleLogout: () -> Unit) {
-    Button(
-        onClick = handleLogout
-    ) {
+    Button(onClick = handleLogout) {
         Text("Logout")
     }
 }

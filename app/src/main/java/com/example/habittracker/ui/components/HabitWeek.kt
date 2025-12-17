@@ -11,11 +11,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.asLiveData
+import com.example.habittracker.HabitLogActivity
 import com.example.habittracker.data.AppRepository
 import com.example.habittracker.data.Habit
 import com.example.habittracker.data.HabitLog
@@ -139,6 +140,35 @@ fun HabitWeek(
                             },
                             onLongClick = {
                                 // start HabitLogActivity to add notes
+                                var habitLogId = habitLogsByDate[nd.utcMidnightMillis]?.habitLogId
+
+                                if (habitLogId == null) {
+                                    // create a new log entry since none exists
+                                    coroutineScope.launch {
+                                        habitLogId = repo.insertHabitLog(
+                                            habit.habitId,
+                                            habit.userId,
+                                            date = nd,
+                                            completed = null
+                                        )
+                                        context.startActivity(
+                                            HabitLogActivity.intentFactory(
+                                                context,
+                                                habitLogId
+                                            )
+                                        )
+                                    }
+                                } else {
+                                    // open existing log entry
+                                    context.startActivity(
+                                        HabitLogActivity.intentFactory(
+                                            context,
+                                            habitLogId!!
+                                        )
+                                    )
+                                }
+
+
                             }
                         ),
                     contentAlignment = Alignment.Center,
