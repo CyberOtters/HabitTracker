@@ -8,7 +8,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.habittracker.data.AppRepository
-import com.example.habittracker.databinding.ActivityAddHabitBinding
+import com.example.habittracker.databinding.ActivityHabitLogBinding
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -30,12 +30,12 @@ class HabitLogActivity : AppCompatActivity() {
         timeZone = TimeZone.getTimeZone("UTC")
     }
 
-    private lateinit var binding: ActivityAddHabitBinding
+    private lateinit var binding: ActivityHabitLogBinding
     private lateinit var repo: AppRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityAddHabitBinding.inflate(layoutInflater)
+        binding = ActivityHabitLogBinding.inflate(layoutInflater)
         repo = AppRepository.getInstance(this)
         setContentView(binding.root)
 
