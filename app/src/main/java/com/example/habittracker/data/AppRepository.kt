@@ -99,7 +99,6 @@ class AppRepository @Inject constructor(
     }
 
 
-
     /***********************
      * HabitLog Operations *
      ***********************/
@@ -164,9 +163,9 @@ class AppRepository @Inject constructor(
         userId: Int,
         date: NormalizedDate,
         completed: Boolean?
-    ) {
+    ): Int {
         val now = Date()
-        db.habitLogDao().insertHabitLog(
+        val habitLogId = db.habitLogDao().insertHabitLog(
             HabitLog(
                 habitLogId = 0,
                 habitId = habitId,
@@ -177,6 +176,8 @@ class AppRepository @Inject constructor(
                 updatedAt = now
             )
         )
+        Log.i("AppRepository", "Inserted HabitLog with ID $habitLogId")
+        return habitLogId.toInt()
     }
 
     suspend fun updateHabitLog(habitLog: HabitLog) {

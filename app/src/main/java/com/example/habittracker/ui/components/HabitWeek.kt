@@ -140,13 +140,35 @@ fun HabitWeek(
                             },
                             onLongClick = {
                                 // start HabitLogActivity to add notes
-                                val userId = habit.userId
-                                context.startActivity(
-                                    HabitLogActivity.intentFactory(
-                                        context,
-                                        userId
+                                var habitLogId = habitLogsByDate[nd.utcMidnightMillis]?.habitLogId
+
+                                if (habitLogId == null) {
+                                    // create a new log entry since none exists
+                                    coroutineScope.launch {
+                                        habitLogId = repo.insertHabitLog(
+                                            habit.habitId,
+                                            habit.userId,
+                                            date = nd,
+                                            completed = null
+                                        )
+                                        context.startActivity(
+                                            HabitLogActivity.intentFactory(
+                                                context,
+                                                habitLogId
+                                            )
+                                        )
+                                    }
+                                } else {
+                                    // open existing log entry
+                                    context.startActivity(
+                                        HabitLogActivity.intentFactory(
+                                            context,
+                                            habitLogId!!
+                                        )
                                     )
-                                )
+                                }
+
+
                             }
                         ),
                     contentAlignment = Alignment.Center,
