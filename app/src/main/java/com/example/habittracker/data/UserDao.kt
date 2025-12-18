@@ -21,7 +21,7 @@ interface UserDao {
     suspend fun getById(id: Int): User?
 
     @Insert
-    suspend fun insert(user: User)
+    suspend fun insert(user: User): Long
 
     @Delete
     suspend fun delete(user: User)

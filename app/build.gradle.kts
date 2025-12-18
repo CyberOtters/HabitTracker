@@ -7,14 +7,14 @@ plugins {
 
 android {
     namespace = "com.example.habittracker"
-    compileSdk {
-        version = release(36)
-    }
+    // Fixed: Changed from invalid block syntax to standard assignment
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.habittracker"
         minSdk = 34
-        targetSdk = 36
+        // Fixed: Set to match a stable SDK version
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -68,7 +68,10 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
-    
+
+    // Added: Necessary for runTest to work in your tests
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
+    androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
 
     implementation("javax.inject:javax.inject:1")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$rootProject.lifecycleVersion")
