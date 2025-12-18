@@ -12,6 +12,7 @@ import com.example.habittracker.data.HabitDAO
 import com.example.habittracker.data.User
 import com.example.habittracker.data.UserDao
 import com.example.habittracker.utils.hashPassword
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert
 import org.junit.Before
@@ -19,7 +20,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.IOException
 import java.util.Date
-import kotlinx.coroutines.test.runTest
 
 
 @RunWith(AndroidJUnit4::class)
@@ -37,7 +37,8 @@ class HabitCategoryTest {
     fun createDb() {
         val context = ApplicationProvider.getApplicationContext<Context>()
         db = Room.inMemoryDatabaseBuilder(
-            context, AppDatabase::class.java).build()
+            context, AppDatabase::class.java
+        ).build()
         userDao = db.userDao()
         habitDao = db.habitDao()
         habitCategoryDao = db.habitCategoryDao()
@@ -72,27 +73,33 @@ class HabitCategoryTest {
 
         // Add habits for testUser
         testUser = byUsername!!
-        habitDao.insert(habit = Habit(
-            userId = testUser.userId,
-            name = "Test Habit 1",
-            description = "This is a the description for Test Habit 1",
-            createdAt = Date(),
-            updatedAt = Date()
-        ))
-        habitDao.insert(habit = Habit(
-            userId = testUser.userId,
-            name = "Test Habit 2",
-            description = "This is a the description for Test Habit 2",
-            createdAt = Date(),
-            updatedAt = Date()
-        ))
-        habitDao.insert(habit = Habit(
-            userId = testUser.userId,
-            name = "Test Habit 3",
-            description = "This is a the description for Test Habit 3",
-            createdAt = Date(),
-            updatedAt = Date()
-        ))
+        habitDao.insert(
+            habit = Habit(
+                userId = testUser.userId,
+                name = "Test Habit 1",
+                description = "This is a the description for Test Habit 1",
+                createdAt = Date(),
+                updatedAt = Date()
+            )
+        )
+        habitDao.insert(
+            habit = Habit(
+                userId = testUser.userId,
+                name = "Test Habit 2",
+                description = "This is a the description for Test Habit 2",
+                createdAt = Date(),
+                updatedAt = Date()
+            )
+        )
+        habitDao.insert(
+            habit = Habit(
+                userId = testUser.userId,
+                name = "Test Habit 3",
+                description = "This is a the description for Test Habit 3",
+                createdAt = Date(),
+                updatedAt = Date()
+            )
+        )
     }
 
     @Test
@@ -101,16 +108,66 @@ class HabitCategoryTest {
         val categories = listOf("Health", "Productivity", "Wellness")
 
         for (categoryName in categories) {
-            val categoryId = habitCategoryDao.insert(habitCategory = HabitCategory(
-                name = categoryName,
-                userId = testUser.userId,
-                description = "Category for $categoryName related habits",
-                createdAt = Date(),
-                updatedAt = Date()
-            ))
+            val categoryId = habitCategoryDao.insert(
+                habitCategory = HabitCategory(
+                    name = categoryName,
+                    userId = testUser.userId,
+                    description = "Category for $categoryName related habits",
+                    createdAt = Date(),
+                    updatedAt = Date()
+                )
+            )
             val retrievedCategory = habitCategoryDao.getById(categoryId.toInt())
             Assert.assertNotNull(retrievedCategory)
             Assert.assertEquals(categoryName, retrievedCategory?.name)
         }
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun updateHabitCategoryTest() = runTest {
+        val categoryId = habitCategoryDao.insert(
+            habitCategory = HabitCategory(
+                name = "Fitness",
+                userId = testUser.userId,
+                description = "Category for fitness related habits",
+                createdAt = Date(),
+                updatedAt = Date()
+            )
+        )
+        val retrievedCategory = habitCategoryDao.getById(categoryId.toInt())
+        Assert.assertNotNull(retrievedCategory)
+        Assert.assertEquals("Fitness", retrievedCategory?.name)
+
+        // Update category name
+        val updatedCategory = retrievedCategory!!.copy(
+            name = "Health & Fitness",
+            updatedAt = Date()
+        )
+        habitCategoryDao.update(updatedCategory)
+        val afterUpdateCategory = habitCategoryDao.getById(categoryId.toInt())
+        Assert.assertNotNull(afterUpdateCategory)
+        Assert.assertEquals("Health & Fitness", afterUpdateCategory?.name)
+    }
+
+    @Test
+    @Throws(Exception::class)
+    fun deleteHabitCategoryTest() = runTest {
+        val categoryId = habitCategoryDao.insert(
+            habitCategory = HabitCategory(
+                name = "test category",
+                userId = testUser.userId,
+                description = "test description",
+                createdAt = Date(),
+                updatedAt = Date()
+            )
+        )
+        val retrievedCategory = habitCategoryDao.getById(categoryId.toInt())
+        Assert.assertNotNull(retrievedCategory)
+
+        habitCategoryDao.delete(retrievedCategory!!)
+
+        val afterDeleteCategory = habitCategoryDao.getById(retrievedCategory.habitCategoryId)
+        Assert.assertNull(afterDeleteCategory)
     }
 }
